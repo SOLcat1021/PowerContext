@@ -836,6 +836,46 @@ def test_omission_counting_leaves_rendered_content_and_origins_unchanged() -> No
     )
 
 
+def test_evidence_selection_preserves_literal_positions_scope_and_complete_budget() -> None:
+    prefix = "Administrative notes. " * 60
+    text = prefix + "The cobalt sensor is calibrated at 37 degrees."
+    build = PreparedContextBuilder().build_scopes_result(
+        request=PrepareContextRequest(query="cobalt sensor calibrated", max_bytes=1200, evidence_selection=True),
+        current_scope_id="current",
+        memory_candidates=(
+            PreparedMemoryCandidates(scope_id="shared", memory_ref=MEMORY_REF, hits=(_hit("sensor", text),)),
+        ),
+    )
+
+    assert build.context.content is not None
+    assert build.context.content_bytes == len(build.context.content.encode()) <= 1200
+    assert len(build.fragments) == len(build.origins) == 1
+    fragment = build.fragments[0]
+    assert fragment.address.memory.scope_id == "shared"
+    assert fragment.text == text[fragment.start : fragment.end]
+    assert "37 degrees" in fragment.text
+    item = json.loads(build.context.content.splitlines()[-2])["items"][0]
+    assert item == {
+        "citation": {
+            "scope_id": "shared",
+            "memory_ref": MEMORY_REF.model_dump(mode="json"),
+            "entry_id": "sensor",
+            "entry_version_id": "sensor-v1",
+        },
+        "content": fragment.text,
+        "start": fragment.start,
+        "end": fragment.end,
+    }
+
+
+def test_evidence_selection_default_is_disabled_and_requires_a_boolean() -> None:
+    baseline = PrepareContextRequest(query="temperature")
+    assert baseline.evidence_selection is False
+    for value in ("true", 1, None):
+        with pytest.raises(ValidationError):
+            PrepareContextRequest.model_validate({"query": "temperature", "evidence_selection": value})
+
+
 def _code_candidates(count: int = 5) -> tuple[PreparedCodeCandidate, ...]:
     content = "def budget():\n    return '预算'\n"
     return tuple(
