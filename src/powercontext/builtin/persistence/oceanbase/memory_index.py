@@ -583,13 +583,10 @@ class OceanBaseMemoryHybridIndex(CompositeMemoryIndex):
             return MemorySearchChannels()
         if request.embedding_profile != self.vector_index.profile or request.query_vector is None:
             raise CapabilityNotSupportedError("embedding-profile")
-        if not await self.vector_index.vector_complete(
-            connection,
-            scope_id,
-            request.memories,
-            self.vector_index.profile,
-        ):
-            raise CapabilityNotSupportedError("vector")
+        # MemoryService checks vector completeness before it selects hybrid mode;
+        # do not repeat its projection scans in the candidate path. The relational
+        # backend still validates requested heads immediately before and after this
+        # statement, so a concurrent head change remains observable to the caller.
         rows = tuple(
             (
                 await connection.execute(
@@ -628,7 +625,7 @@ def _hybrid_search_statement(profile: EmbeddingProfile, *, tagged: bool) -> Text
             memory_tag_sql("f") + "    ORDER BY relevance DESC",
         ).replace(
             "    ORDER BY l2_distance(m.embedding, :query_vector) APPROXIMATE",
-            memory_tag_sql("m") + "    ORDER BY l2_distance(m.embedding, :query_vector)",
+            memory_tag_sql("m") + "    ORDER BY l2_distance(m.embedding, :query_vector) APPROXIMATE",
         )
         parameters.extend((bindparam("tag_keys", expanding=True), bindparam("tag_hashes", expanding=True)))
     return text(sql).bindparams(*parameters)
