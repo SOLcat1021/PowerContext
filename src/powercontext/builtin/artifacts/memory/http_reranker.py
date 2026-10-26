@@ -37,21 +37,21 @@ class HTTPMemoryReranker:
         batch_size: int = 32,
         policy_id: str = "http-cross-encoder-v1",
     ) -> None:
-        if batch_size < 1:
+        if type(batch_size) is not int or batch_size < 1:
             raise ValueError("batch_size must be positive")
         self.endpoint = endpoint
         self.client = client
         self.batch_size = batch_size
         self.policy_id = policy_id
 
-    async def rerank(
+    async def rerank(  # noqa: C901
         self,
         query: str,
         candidates: tuple[MemoryHit, ...],
         limit: int,
         /,
     ) -> MemoryRerankDecision:
-        if not candidates or limit < 1 or limit > len(candidates):
+        if not candidates or type(limit) is not int or limit < 1 or limit > len(candidates):
             raise ValueError("limit must be between one and the candidate count")
 
         scores: dict[int, float] = {}
@@ -87,10 +87,15 @@ class HTTPMemoryReranker:
                     or rank not in ranks
                     or rank in batch_scores
                     or type(score) not in (int, float)
-                    or not math.isfinite(score)
                 ):
                     raise ValueError("Invalid reranker score or rank coverage")
-                batch_scores[rank] = float(score)
+                try:
+                    numeric_score = float(score)
+                except OverflowError as exc:
+                    raise ValueError("Reranker score exceeds the numeric range") from exc
+                if not math.isfinite(numeric_score):
+                    raise ValueError("Reranker score must be finite")
+                batch_scores[rank] = numeric_score
             if set(batch_scores) != ranks:
                 raise ValueError("Reranker response does not cover the batch")
             scores.update(batch_scores)
