@@ -261,11 +261,15 @@ def _pdf_page_scores(
 ) -> dict[tuple[str, int, str, str], float]:
     """Rank evidence-bearing pages, not pages with scattered filing vocabulary."""
 
-    question_terms = set(terms)
+    normalized_terms = tuple(_pdf_financial_term(term) for term in terms)
+    question_terms = set(normalized_terms)
     # The first line is the document ID in the required text projection. Its
     # words appear on every page and provide no page-level evidence.
     page_tokens = {
-        identity: re.findall(r"[a-z]+|\d+", hit.text.partition("\n")[2].casefold()) for identity, hit in hits.items()
+        identity: [
+            _pdf_financial_term(token) for token in re.findall(r"[a-z]+|\d+", hit.text.partition("\n")[2].casefold())
+        ]
+        for identity, hit in hits.items()
     }
     document_frequency = Counter(term for tokens in page_tokens.values() for term in question_terms & set(tokens))
     page_count = len(page_tokens)
@@ -279,7 +283,7 @@ def _pdf_page_scores(
 
     query_pairs = tuple(
         (first, second)
-        for first, second in pairwise(terms)
+        for first, second in pairwise(normalized_terms)
         if len(first) >= 3 and len(second) >= 3 and first in term_weights and second in term_weights
     )
     scores = {}
@@ -306,6 +310,39 @@ def _pdf_page_scores(
     return scores
 
 
+def _pdf_financial_term(term: str) -> str:
+    """Merge common filing paraphrases without changing the stored page text."""
+
+    return _PDF_FINANCIAL_ALIASES.get(term, term)
+
+
+_PDF_FINANCIAL_ALIASES = {
+    "assets": "asset",
+    "advertising": "marketing",
+    "advertisement": "marketing",
+    "commercials": "marketing",
+    "promotion": "marketing",
+    "promotional": "marketing",
+    "equity": "stock",
+    "shares": "stock",
+    "shareholder": "stock",
+    "shareholders": "stock",
+    "stockholder": "stock",
+    "stockholders": "stock",
+    "debts": "liability",
+    "debt": "liability",
+    "liabilities": "liability",
+    "obligation": "liability",
+    "obligations": "liability",
+    "expenses": "expense",
+    "expensed": "expense",
+    "outlay": "expense",
+    "outlays": "expense",
+    "spending": "expense",
+    "sales": "revenue",
+}
+
+
 def _pdf_section_cues(question: str) -> tuple[tuple[str, str, bool, int], ...]:
     """Find filing section names implied by a question, without document-specific facts."""
 
@@ -315,6 +352,10 @@ def _pdf_section_cues(question: str) -> tuple[tuple[str, str, bool, int], ...]:
         cues.append(("our operations reportable segments", "our operations", False, 1))
     if any(term in lowered for term in ("legal", "litigation", "lawsuit", "legal battle")):
         cues.append(("item 3 legal proceedings", "item 3 legal proceedings", False, 1))
+    if "assets" in lowered and any(term in lowered for term in ("liabilit", "obligation", "debt", "equity", "capital")):
+        cues.append(("consolidated balance sheet", "balance sheet", True, 1))
+    if "market" in lowered and any(term in lowered for term in ("common stock", "common equity", "shareholders")):
+        cues.append(("common equity related stockholder", "common equity related stockholder matters", True, 1))
     if any(term in lowered for term in ("income statement", "p&l", "profit and loss", "operating income", "ebitda")):
         cues.extend((
             ("consolidated statement of income", "statement of income", True, 1),
@@ -364,6 +405,7 @@ def _pdf_query_variants(question: str) -> tuple[str, ...]:
         ),
         (("cash flow",), "consolidated statements cash flows depreciation amortization capital expenditures"),
         (("restructur",), "restructuring impairment charges restructuring costs severance"),
+        (("promot", "advertis", "marketing"), "advertising marketing promotional expenses expensed"),
         (
             ("materially important", "materially significant", "material"),
             "material materiality significant reasonably possible probable",
