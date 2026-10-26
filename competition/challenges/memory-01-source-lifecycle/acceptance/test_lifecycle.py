@@ -72,6 +72,37 @@ def test_event_identity_revision_and_dag_registration_are_strict():
         SourceLifecycleEvent(node_id="x", revision=0, sequence=0, available=False, reason="", extra=True)
 
 
+def test_interrupted_memory_alignment_retries_same_event_without_extra_revision(monkeypatch, tmp_path):
+    async def run():
+        config = BuiltinConfig(database=SQLiteConfig(url=f"sqlite+aiosqlite:///{tmp_path / 'retry.db'}"))
+        async with open_builtin_runtime(config) as runtime:
+            scope, lifecycle, bindings, citations = await build(runtime, suffix="retry")
+            service_type = type(lifecycle)
+            original_align = service_type._align_memory
+            failed = False
+
+            async def align_then_interrupt(context, nodes, active):
+                nonlocal failed
+                await original_align(context, nodes, active)
+                if not failed:
+                    failed = True
+                    raise RuntimeError("injected interruption after memory state write")
+
+            monkeypatch.setattr(service_type, "_align_memory", staticmethod(align_then_interrupt))
+            with pytest.raises(RuntimeError, match="injected interruption"):
+                await lifecycle.apply(event("root0", 1, False))
+
+            after_interruption = (await runtime.memory.for_scope(scope).list()).memory_ref
+            monkeypatch.setattr(service_type, "_align_memory", staticmethod(original_align))
+            actual = await lifecycle.apply(event("root0", 1, False))
+            after_retry = (await runtime.memory.for_scope(scope).list()).memory_ref
+            assert actual == sorted(oracle(bindings, {"root0"}))
+            assert after_retry == after_interruption
+            await assert_runtime(runtime, scope, bindings, citations, oracle(bindings, {"root0"}))
+
+    asyncio.run(run())
+
+
 def test_new_derivatives_of_withdrawn_evidence_stay_out_of_generation():
     async def run():
         async with open_builtin_runtime(BuiltinConfig(database=SQLiteConfig())) as runtime:
