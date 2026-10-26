@@ -348,20 +348,56 @@ def _pdf_section_cues(question: str) -> tuple[tuple[str, str, bool, int], ...]:
 
     lowered = question.casefold()
     cues = []
+    capital_intensity = "capital-intensive" in lowered or "capital intensive" in lowered
     if any(term in lowered for term in ("geograph", "region", "primarily operate")):
         cues.append(("our operations reportable segments", "our operations", False, 1))
+        cues.append(("geographic operations", "geographic operations", True, 1))
+        cues.append(("company overview", "company overview", True, 1))
     if any(term in lowered for term in ("legal", "litigation", "lawsuit", "legal battle")):
         cues.append(("item 3 legal proceedings", "item 3 legal proceedings", False, 1))
-    if "assets" in lowered and any(term in lowered for term in ("liabilit", "obligation", "debt", "equity", "capital")):
+    if (
+        "balance sheet" in lowered
+        or "quick ratio" in lowered
+        or capital_intensity
+        or (
+            "assets" in lowered
+            and any(term in lowered for term in ("liabilit", "obligation", "debt", "equity", "capital"))
+        )
+    ):
         cues.append(("consolidated balance sheet", "balance sheet", True, 1))
+        cues.append(("consolidated balance sheets", "balance sheets", True, 1))
+    if any(term in lowered for term in ("product categor", "service categor", "revenue segment")):
+        cues.append(("summary of business segment data", "summary of business segment data", True, 1))
+        cues.append(("segment revenues", "segment revenues", True, 1))
+    if "segment" in lowered and any(term in lowered for term in ("growth", "performance", "sales")):
+        cues.append(("sales and operating income by business segment", "by business segment", True, 1))
     if "market" in lowered and any(term in lowered for term in ("common stock", "common equity", "shareholders")):
         cues.append(("common equity related stockholder", "common equity related stockholder matters", True, 1))
-    if any(term in lowered for term in ("income statement", "p&l", "profit and loss", "operating income", "ebitda")):
+    if (
+        any(
+            term in lowered
+            for term in (
+                "income statement",
+                "p&l",
+                "profit and loss",
+                "operating income",
+                "gross margin",
+                "operating margin",
+                "ebitda",
+                "tax rate",
+            )
+        )
+        or capital_intensity
+    ):
         cues.extend((
             ("consolidated statement of income", "statement of income", True, 1),
+            ("consolidated statements of income", "statements of income", True, 1),
             ("consolidated statements of operations", "statements of operations", True, 1),
+            ("consolidated statement of operations", "statement of operations", True, 1),
         ))
-    if any(term in lowered for term in ("cash flow", "capex", "capital expenditure", "ebitda")):
+    if "tax rate" in lowered:
+        cues.append(("summary of financial performance", "summary of financial performance", True, 1))
+    if any(term in lowered for term in ("cash flow", "capex", "capital expenditure", "ebitda")) or capital_intensity:
         cues.append(("consolidated statement of cash flows", "statement of cash flows", True, 1))
     return tuple(cues)
 
@@ -406,6 +442,7 @@ def _pdf_query_variants(question: str) -> tuple[str, ...]:
         (("cash flow",), "consolidated statements cash flows depreciation amortization capital expenditures"),
         (("restructur",), "restructuring impairment charges restructuring costs severance"),
         (("promot", "advertis", "marketing"), "advertising marketing promotional expenses expensed"),
+        (("customer concentration", "major customer"), "one customer accounted revenue sales concentration"),
         (
             ("materially important", "materially significant", "material"),
             "material materiality significant reasonably possible probable",
