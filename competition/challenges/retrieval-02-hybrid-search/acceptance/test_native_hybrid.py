@@ -134,10 +134,28 @@ async def test_seekdb_executes_one_native_hybrid_candidate_statement() -> None:
         target = MemoryEntryTagTarget(artifact_id=head.artifact_id, entry_id=beta.entry_id)
         empty = await contexts.records.get_tags("project", target)
         await contexts.records.replace_tags("project", target, ("selected",), expected_etag=empty.etag)
-        tagged = await memory.search(
-            "beta", memories=(revised_head,), mode="hybrid", limit=1, tag_filter=TagFilter(tags=("selected",))
-        )
+        with _statements() as tagged_statements:
+            tagged = await memory.search(
+                "beta", memories=(revised_head,), mode="hybrid", limit=1, tag_filter=TagFilter(tags=("selected",))
+            )
         assert [hit.entry_id for hit in tagged.hits] == [beta.entry_id]
+        tagged_native = [
+            (candidate_statement, candidate_parameters)
+            for candidate_statement, candidate_parameters in tagged_statements
+            if "pc_memory_entry_heads" in candidate_statement
+            and "pc_memory_vector_entries" in candidate_statement
+            and "AGAINST" in candidate_statement.upper()
+            and "l2_distance" in candidate_statement.lower()
+        ]
+        assert len(tagged_native) == 1
+        tagged_statement, tagged_parameters = tagged_native[0]
+        async with contexts.database.transaction() as connection:
+            tagged_plan = "\n".join(
+                str(row[0])
+                for row in (await connection.exec_driver_sql(f"EXPLAIN {tagged_statement}", tagged_parameters)).all()
+            )
+        assert "TEXT RETRIEVAL SCAN" in tagged_plan
+        assert "VECTOR INDEX" in tagged_plan
         alpha = next(entry for entry in await memory.entries(revised_head) if entry.text == "Alpha semantic record.")
         latest = await memory.remember(
             memory=revised_head,
