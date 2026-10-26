@@ -590,9 +590,7 @@ class OceanBaseMemoryHybridIndex(CompositeMemoryIndex):
         rows = tuple(
             (
                 await connection.execute(
-                    self._hybrid_search_sql
-                    if request.tag_filter is None
-                    else self._tagged_hybrid_search_sql,
+                    self._hybrid_search_sql if request.tag_filter is None else self._tagged_hybrid_search_sql,
                     {
                         "scope_id": scope_id,
                         "memory_artifact_ids": tuple(memory.artifact_id for memory in request.memories),
