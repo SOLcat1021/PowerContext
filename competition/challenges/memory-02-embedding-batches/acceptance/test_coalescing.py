@@ -122,6 +122,29 @@ def test_failure_is_not_cached() -> None:
     asyncio.run(scenario())
 
 
+def test_provider_cancellation_releases_in_flight_text_for_retry() -> None:
+    class CancelOnce(Embedding):
+        async def embed(self, texts):
+            self.calls.append(texts)
+            if len(self.calls) == 1:
+                raise asyncio.CancelledError
+            return EmbeddingResult(vectors=tuple((1.0,) for _ in texts))
+
+    async def scenario() -> None:
+        base = CancelOnce()
+        model = CoalescingEmbeddingModel(base, coalesce_ms=0)
+        with pytest.raises(asyncio.CancelledError):
+            await model.embed(("retry-after-provider-cancellation",))
+        result = await model.embed(("retry-after-provider-cancellation",))
+        assert result.vectors == ((1.0,),)
+        assert base.calls == [
+            ("retry-after-provider-cancellation",),
+            ("retry-after-provider-cancellation",),
+        ]
+
+    asyncio.run(scenario())
+
+
 def test_provider_usage_is_preserved_and_cache_hits_do_not_charge_again() -> None:
     class Metered(Embedding):
         async def embed(self, texts):
