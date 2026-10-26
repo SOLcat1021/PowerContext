@@ -164,6 +164,12 @@ class CoalescingEmbeddingModel:
                     result = await delegate(batch)
                     if len(result.vectors) != len(batch):
                         _raise_invalid_vector_count(len(result.vectors), len(batch))
+                except asyncio.CancelledError as error:
+                    # A provider can cancel its own request independently of any
+                    # waiter. Release these keys before propagating cancellation
+                    # so a later call can retry instead of awaiting stale futures.
+                    self._fail_batch(state, batch, futures, error)
+                    raise
                 except Exception as error:
                     self._fail_batch(state, batch, futures, error)
                     continue
@@ -185,7 +191,7 @@ class CoalescingEmbeddingModel:
         state: _EmbeddingState,
         texts: tuple[str, ...],
         futures: tuple[asyncio.Future[_ResolvedEmbedding], ...],
-        error: Exception,
+        error: BaseException,
     ) -> None:
         for text, future in zip(texts, futures, strict=True):
             if state.in_flight.get(text) is future:
