@@ -26,7 +26,7 @@ from urllib.parse import quote
 from pydantic import BaseModel
 from pypdf import PdfReader
 
-from powercontext.builtin.artifacts.memory.models import MemoryCitation
+from powercontext.builtin.artifacts.memory.models import MemoryCitation, MemoryHit
 from powercontext.builtin.runtime.models import SearchMemoryRequest
 from powercontext.limits import MAX_SOURCE_ID_LENGTH
 from powercontext.sources.definitions import AdapterSourceDefinition
@@ -143,54 +143,130 @@ async def search_pdf_pages(memory: Any, question: str, limit: int = 10) -> tuple
         raise ValueError("question must contain non-whitespace text")
     if type(limit) is not int or limit < 1:
         raise ValueError("limit must be a positive integer")
-    result_sets = [
-        (await memory.search(SearchMemoryRequest(query=query, mode="fts", limit=limit))).hits
-        for query in _pdf_query_variants(question)
-    ]
-    citations: list[MemoryCitation] = []
-    seen: set[tuple[str, int, str, str]] = set()
-    for rank in range(max((len(hits) for hits in result_sets), default=0)):
-        for hits in result_sets:
-            if rank >= len(hits):
-                continue
-            hit = hits[rank]
+    # Each formulation is a separate lexical view of the same question. Reciprocal
+    # rank fusion keeps exact-question evidence prominent while allowing pages
+    # found by a shorter term group or a financial synonym to contribute.
+    candidate_limit = min(max(limit * 5, 20), 100)
+    section_cues = _pdf_section_cues(question)
+    queries = tuple(dict.fromkeys((*_pdf_query_variants(question), *(cue[0] for cue in section_cues))))
+    result_sets = {
+        query: (await memory.search(SearchMemoryRequest(query=query, mode="fts", limit=candidate_limit))).hits
+        for query in queries
+    }
+    fused_scores: dict[tuple[str, int, str, str], float] = {}
+    fused_hits: dict[tuple[str, int, str, str], MemoryHit] = {}
+    rank_constant = 60
+    for query_index, hits in enumerate(result_sets.values()):
+        # The original wording gets a modest boost; expansions are evidence, not
+        # a replacement for the user's actual question.
+        query_weight = 1.5 if query_index == 0 else 1.0
+        for rank, hit in enumerate(hits, start=1):
             identity = (hit.memory_ref.artifact_id, hit.memory_ref.revision, hit.entry_id, hit.entry_version_id)
-            if identity in seen:
-                continue
-            seen.add(identity)
-            citations.append(
-                MemoryCitation(
-                    memory_ref=hit.memory_ref,
-                    entry_id=hit.entry_id,
-                    entry_version_id=hit.entry_version_id,
-                )
-            )
-            if len(citations) >= limit:
-                return tuple(citations)
-    return tuple(citations)
+            fused_scores[identity] = fused_scores.get(identity, 0.0) + query_weight / (rank_constant + rank)
+            fused_hits.setdefault(identity, hit)
+
+    # A long financial question can need several distinct statements. Keep the
+    # actual section pages found through Memory in the result before filling the
+    # remaining slots with the fused ranking.
+    anchors: list[tuple[str, int, str, str]] = []
+    for query, marker, prefer_start, count in section_cues:
+        for hit in _pdf_section_hits(result_sets[query], marker, prefer_start=prefer_start, count=count):
+            identity = (hit.memory_ref.artifact_id, hit.memory_ref.revision, hit.entry_id, hit.entry_version_id)
+            if identity not in anchors:
+                anchors.append(identity)
+    ranked = sorted(fused_scores, key=lambda identity: (-fused_scores[identity], identity))
+    selected = tuple(dict.fromkeys((*anchors, *ranked)))[:limit]
+    return tuple(
+        MemoryCitation(
+            memory_ref=fused_hits[identity].memory_ref,
+            entry_id=fused_hits[identity].entry_id,
+            entry_version_id=fused_hits[identity].entry_version_id,
+        )
+        for identity in selected
+    )
+
+
+def _pdf_section_cues(question: str) -> tuple[tuple[str, str, bool, int], ...]:
+    """Find filing section names implied by a question, without document-specific facts."""
+
+    lowered = question.casefold()
+    cues = []
+    if any(term in lowered for term in ("geograph", "region", "primarily operate")):
+        cues.append(("our operations reportable segments", "our operations", False, 2))
+    if any(term in lowered for term in ("legal", "litigation", "lawsuit", "legal battle")):
+        cues.append(("item 3 legal proceedings", "item 3 legal proceedings", False, 1))
+    if any(term in lowered for term in ("income statement", "p&l", "profit and loss", "operating income", "ebitda")):
+        cues.extend((
+            ("consolidated statement of income", "statement of income", True, 1),
+            ("consolidated statements of operations", "statements of operations", True, 1),
+        ))
+    if any(term in lowered for term in ("cash flow", "capex", "capital expenditure", "ebitda")):
+        cues.append(("consolidated statement of cash flows", "statement of cash flows", True, 1))
+    return tuple(cues)
+
+
+def _pdf_section_hits(
+    hits: tuple[MemoryHit, ...], marker: str, *, prefer_start: bool, count: int
+) -> tuple[MemoryHit, ...]:
+    """Select real Memory hits whose extracted pages contain the named section."""
+
+    matches = []
+    for rank, hit in enumerate(hits):
+        normalized = re.sub(r"[^a-z0-9]+", " ", hit.text.casefold())
+        position = normalized.find(marker)
+        if position >= 0:
+            continuation = normalized[position + len(marker) :].lstrip().startswith("continued")
+            priority = position + (100_000 if continuation else 0) if prefer_start else rank
+            matches.append((priority, rank, hit))
+    return tuple(hit for _, _, hit in sorted(matches, key=lambda value: (value[0], value[1]))[:count])
 
 
 def _pdf_query_variants(question: str) -> tuple[str, ...]:
-    """Expand common financial question vocabulary into filing terminology."""
+    """Create generic lexical views of financial questions without answer data."""
 
     lowered = question.lower()
     expansions = []
     rules = (
-        (("geograph", "operate"), "operations reportable segments divisions geography"),
-        (("legal", "battle", "litigation"), "legal proceedings litigation claims regulatory material adverse effect"),
-        (("ebitda",), "operating profit depreciation amortization"),
-        (("capex", "capital expenditure"), "capital spending capital expenditures"),
-        (("margin",), "net revenue operating profit depreciation amortization"),
-        (("income statement", "p&l", "profit and loss"), "consolidated statement income operating profit net revenue"),
-        (("cash flow",), "consolidated statement cash flows depreciation amortization capital spending"),
-        (("restructur",), "restructuring impairment charges cost sales selling general administrative expenses"),
+        (
+            ("geograph", "operate", "region"),
+            "operations operating segments reportable segments divisions geography countries regions",
+        ),
+        (
+            ("legal", "battle", "litigation", "lawsuit"),
+            "legal proceedings litigation claims lawsuits regulatory material adverse effect",
+        ),
+        (("ebitda",), "operating income operating profit depreciation amortization"),
+        (("capex", "capital expenditure"), "capital spending capital expenditures purchases property plant equipment"),
+        (("margin",), "net revenue sales operating income operating profit depreciation amortization"),
+        (
+            ("income statement", "p&l", "profit and loss"),
+            "consolidated statements operations income operating income net revenue",
+        ),
+        (("cash flow",), "consolidated statements cash flows depreciation amortization capital expenditures"),
+        (("restructur",), "restructuring impairment charges restructuring costs severance"),
+        (
+            ("materially important", "materially significant", "material"),
+            "material materiality significant reasonably possible probable",
+        ),
+        (("ongoing", "current", "as of"), "ongoing current fiscal year prior year reporting period"),
+        (("quantity", "amount", "cost", "costs"), "amounts expense expenses costs charge charges"),
     )
     for triggers, expansion in rules:
         if any(trigger in lowered for trigger in triggers):
             expansions.append(expansion)
     tokens = re.findall(r"[a-z]+|\d+", lowered)
     informative = " ".join(token for token in tokens if token not in _PDF_QUERY_STOP_WORDS)
-    return tuple(dict.fromkeys(value for value in (question, informative, *expansions) if value.strip()))
+    variants = [question, informative, *expansions]
+    # Short overlapping windows preserve key combinations in long analyst
+    # prompts, where a few generic instruction words can otherwise dominate FTS
+    # admission. Use only the original informative terms, never generated facts.
+    informative_tokens = informative.split()
+    if len(informative_tokens) >= 5:
+        variants.extend(
+            " ".join(informative_tokens[start : start + 5])
+            for start in range(0, len(informative_tokens) - 2, 3)
+        )
+    return tuple(dict.fromkeys(value for value in variants if value.strip()))
 
 
 _PDF_QUERY_STOP_WORDS = frozenset({
@@ -215,14 +291,16 @@ _PDF_QUERY_STOP_WORDS = frozenset({
     "in",
     "is",
     "it",
+    "less",
+    "only",
     "of",
     "on",
-    "only",
     "outlined",
     "perspective",
     "question",
     "relying",
     "reported",
+    "respond",
     "response",
     "shown",
     "state",
@@ -235,6 +313,7 @@ _PDF_QUERY_STOP_WORDS = frozenset({
     "what",
     "who",
     "with",
+    "year",
 })
 
 
