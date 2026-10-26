@@ -13,6 +13,8 @@
 
 """Score Memory candidates with a caller-owned HTTP client."""
 
+# ruff: noqa: TRY003 -- Protocol validation failures intentionally use ValueError.
+
 from __future__ import annotations
 
 import math
@@ -62,8 +64,7 @@ class HTTPMemoryReranker:
                 json={
                     "query": query,
                     "candidates": [
-                        {"rank": rank, "text": candidate.text}
-                        for rank, candidate in enumerate(batch, start=start + 1)
+                        {"rank": rank, "text": candidate.text} for rank, candidate in enumerate(batch, start=start + 1)
                     ],
                 },
             )

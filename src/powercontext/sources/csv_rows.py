@@ -13,6 +13,8 @@
 
 """Capture CSV records as stable, individually citable Sources."""
 
+# ruff: noqa: TRY003 -- Public validation failures intentionally use ValueError.
+
 from __future__ import annotations
 
 import csv
@@ -63,7 +65,7 @@ def csv_row_source_id(document_id: str, primary_key_value: str) -> str:
     return source_id
 
 
-def parse_csv_document(value: CSVDocumentInput) -> tuple[CSVRowInput, ...]:
+def parse_csv_document(value: CSVDocumentInput) -> tuple[CSVRowInput, ...]:  # noqa: C901
     """Parse and validate the whole document before exposing any row."""
     if not value.document_id or value.document_id != value.document_id.strip():
         raise ValueError("document_id must be nonempty and have no surrounding whitespace")
