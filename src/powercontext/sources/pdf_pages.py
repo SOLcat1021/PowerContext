@@ -19,7 +19,9 @@ from __future__ import annotations
 
 import hashlib
 import io
+import math
 import re
+from collections import Counter
 from typing import Any
 from urllib.parse import quote
 
@@ -143,25 +145,18 @@ async def search_pdf_pages(memory: Any, question: str, limit: int = 10) -> tuple
         raise ValueError("question must contain non-whitespace text")
     if type(limit) is not int or limit < 1:
         raise ValueError("limit must be a positive integer")
-    # Each formulation is a separate lexical view of the same question. Reciprocal
-    # rank fusion keeps exact-question evidence prominent while allowing pages
-    # found by a shorter term group or a financial synonym to contribute.
     candidate_limit = min(max(limit * 5, 20), 100)
     section_cues = _pdf_section_cues(question)
-    queries = tuple(dict.fromkeys((*_pdf_query_variants(question), *(cue[0] for cue in section_cues))))
-    result_sets = {
-        query: (await memory.search(SearchMemoryRequest(query=query, mode="fts", limit=candidate_limit))).hits
-        for query in queries
-    }
+    result_sets, query_weights, informative_terms = await _pdf_search_candidates(
+        memory, question, section_cues, candidate_limit
+    )
     fused_scores: dict[tuple[str, int, str, str], float] = {}
     fused_hits: dict[tuple[str, int, str, str], MemoryHit] = {}
     rank_constant = 60
-    for query_index, hits in enumerate(result_sets.values()):
-        # The original wording gets a modest boost; expansions are evidence, not
-        # a replacement for the user's actual question.
-        query_weight = 1.5 if query_index == 0 else 1.0
+    for query, hits in result_sets.items():
+        query_weight = query_weights[query]
         for rank, hit in enumerate(hits, start=1):
-            identity = (hit.memory_ref.artifact_id, hit.memory_ref.revision, hit.entry_id, hit.entry_version_id)
+            identity = _pdf_hit_identity(hit)
             fused_scores[identity] = fused_scores.get(identity, 0.0) + query_weight / (rank_constant + rank)
             fused_hits.setdefault(identity, hit)
 
@@ -171,10 +166,18 @@ async def search_pdf_pages(memory: Any, question: str, limit: int = 10) -> tuple
     anchors: list[tuple[str, int, str, str]] = []
     for query, marker, prefer_start, count in section_cues:
         for hit in _pdf_section_hits(result_sets[query], marker, prefer_start=prefer_start, count=count):
-            identity = (hit.memory_ref.artifact_id, hit.memory_ref.revision, hit.entry_id, hit.entry_version_id)
+            identity = _pdf_hit_identity(hit)
             if identity not in anchors:
                 anchors.append(identity)
-    ranked = sorted(fused_scores, key=lambda identity: (-fused_scores[identity], identity))
+    lexical_scores = _pdf_lexical_scores(fused_hits, informative_terms)
+    peak_fusion = max(fused_scores.values(), default=1.0)
+    ranked = sorted(
+        fused_scores,
+        key=lambda identity: (
+            -(0.7 * fused_scores[identity] / peak_fusion + 0.3 * lexical_scores[identity]),
+            identity,
+        ),
+    )
     selected = tuple(dict.fromkeys((*anchors, *ranked)))[:limit]
     return tuple(
         MemoryCitation(
@@ -184,6 +187,73 @@ async def search_pdf_pages(memory: Any, question: str, limit: int = 10) -> tuple
         )
         for identity in selected
     )
+
+
+async def _pdf_search_candidates(
+    memory: Any,
+    question: str,
+    section_cues: tuple[tuple[str, str, bool, int], ...],
+    candidate_limit: int,
+) -> tuple[dict[str, tuple[MemoryHit, ...]], dict[str, float], tuple[str, ...]]:
+    query_weights: dict[str, float] = {}
+    for index, query in enumerate(_pdf_query_variants(question)):
+        query_weights[query] = max(query_weights.get(query, 0.0), (1.5, 1.25)[index] if index < 2 else 0.75)
+    for query, _marker, _prefer_start, _count in section_cues:
+        query_weights[query] = max(query_weights.get(query, 0.0), 0.8)
+    result_sets: dict[str, tuple[MemoryHit, ...]] = {}
+    for query in query_weights:
+        result_sets[query] = (
+            await memory.search(SearchMemoryRequest(query=query, mode="fts", limit=candidate_limit))
+        ).hits
+
+    # Broad financial terms can fill an FTS candidate cap before a distinctive
+    # question term is considered. Search a few such terms on their own when the
+    # first pass barely found them; all candidates still come from scoped Memory.
+    informative_terms = _pdf_informative_terms(question)
+    initial_texts = {
+        _pdf_hit_identity(hit): set(re.findall(r"[a-z]+|\d+", hit.text.casefold()))
+        for hits in result_sets.values()
+        for hit in hits
+    }
+    coverage = Counter(term for tokens in initial_texts.values() for term in set(informative_terms) & tokens)
+    rare_terms = sorted(
+        (term for term in set(informative_terms) if len(term) >= 4 and not term.isdigit()),
+        key=lambda term: (coverage[term], -len(term), term),
+    )
+    for term in rare_terms[:4]:
+        if term not in result_sets and coverage[term] < max(len(initial_texts) // 3, 1):
+            query_weights[term] = 0.4
+            result_sets[term] = (
+                await memory.search(SearchMemoryRequest(query=term, mode="fts", limit=candidate_limit))
+            ).hits
+    return result_sets, query_weights, informative_terms
+
+
+def _pdf_hit_identity(hit: MemoryHit) -> tuple[str, int, str, str]:
+    return (hit.memory_ref.artifact_id, hit.memory_ref.revision, hit.entry_id, hit.entry_version_id)
+
+
+def _pdf_lexical_scores(
+    hits: dict[tuple[str, int, str, str], MemoryHit], terms: tuple[str, ...]
+) -> dict[tuple[str, int, str, str], float]:
+    """Favor distinctive question vocabulary while discounting repeated filing boilerplate."""
+
+    question_terms = set(terms)
+    page_terms = {identity: set(re.findall(r"[a-z]+|\d+", hit.text.casefold())) for identity, hit in hits.items()}
+    document_frequency = Counter(term for tokens in page_terms.values() for term in question_terms & tokens)
+    page_count = len(page_terms)
+    term_weights = {
+        term: math.log((page_count + 1) / (document_frequency[term] + 1))
+        for term in question_terms
+        if document_frequency[term]
+    }
+    total_weight = sum(term_weights.values())
+    return {
+        identity: (
+            sum(term_weights.get(term, 0.0) for term in question_terms & tokens) / total_weight if total_weight else 0.0
+        )
+        for identity, tokens in page_terms.items()
+    }
 
 
 def _pdf_section_cues(question: str) -> tuple[tuple[str, str, bool, int], ...]:
@@ -254,8 +324,7 @@ def _pdf_query_variants(question: str) -> tuple[str, ...]:
     for triggers, expansion in rules:
         if any(trigger in lowered for trigger in triggers):
             expansions.append(expansion)
-    tokens = re.findall(r"[a-z]+|\d+", lowered)
-    informative = " ".join(token for token in tokens if token not in _PDF_QUERY_STOP_WORDS)
+    informative = " ".join(_pdf_informative_terms(question))
     variants = [question, informative, *expansions]
     # Short overlapping windows preserve key combinations in long analyst
     # prompts, where a few generic instruction words can otherwise dominate FTS
@@ -263,10 +332,15 @@ def _pdf_query_variants(question: str) -> tuple[str, ...]:
     informative_tokens = informative.split()
     if len(informative_tokens) >= 5:
         variants.extend(
-            " ".join(informative_tokens[start : start + 5])
-            for start in range(0, len(informative_tokens) - 2, 3)
+            " ".join(informative_tokens[start : start + 5]) for start in range(0, len(informative_tokens) - 2, 3)
         )
     return tuple(dict.fromkeys(value for value in variants if value.strip()))
+
+
+def _pdf_informative_terms(question: str) -> tuple[str, ...]:
+    return tuple(
+        token for token in re.findall(r"[a-z]+|\d+", question.casefold()) if token not in _PDF_QUERY_STOP_WORDS
+    )
 
 
 _PDF_QUERY_STOP_WORDS = frozenset({
@@ -325,7 +399,10 @@ def _pdf_page_source_id(document_id: str, document_sha256: str, page_number: int
         raise ValueError("page_number must be a positive integer")
     source_id = f"pdf:{quote(document_id, safe='')}:{document_sha256}:{page_number}"
     if len(source_id) > MAX_SOURCE_ID_LENGTH:
-        raise ValueError("PDF page source identity exceeds the maximum length")
+        document_key = hashlib.sha256(document_id.encode("utf-8")).hexdigest()
+        # A caret is always percent-encoded by quote(), so this namespace
+        # cannot collide with a literal short document ID.
+        source_id = f"pdf:^sha256-{document_key}:{document_sha256}:{page_number}"
     return source_id
 
 
