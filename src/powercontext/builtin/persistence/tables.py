@@ -696,6 +696,25 @@ CONNECTOR_CHECKPOINTS_TABLE = Table(
     Column("checkpoint", _canonical_payload_type(), nullable=False),
 )
 
+SOURCE_LIFECYCLE_NODES_TABLE = Table(
+    "pc_source_lifecycle_nodes",
+    SHARED_METADATA,
+    Column("scope_id", identity_string(MAX_SCOPE_ID_LENGTH), primary_key=True),
+    Column("node_id", identity_string(256), primary_key=True),
+    Column("kind", String(16), nullable=False),
+    Column("reference_payload", _entry_text_type(), nullable=False),
+    Column("lifecycle_revision", Integer),
+    Column("parents_payload", _entry_text_type(), nullable=False),
+    Column("policy", String(8)),
+    Column("active", Boolean, nullable=False),
+    Column("last_sequence", Integer),
+    Column("last_event_payload", _entry_text_type()),
+    ForeignKeyConstraint(("scope_id",), ("pc_scopes.scope_id",), ondelete="CASCADE"),
+    CheckConstraint("kind IN ('source', 'memory', 'topic')", name="ck_pc_source_lifecycle_kind"),
+    CheckConstraint("lifecycle_revision IS NULL OR lifecycle_revision > 0", name="ck_pc_source_lifecycle_revision"),
+    CheckConstraint("last_sequence IS NULL OR last_sequence > 0", name="ck_pc_source_lifecycle_sequence"),
+)
+
 SOURCE_DEFINITION_MANIFESTS_TABLE = Table(
     "pc_source_definition_manifests",
     SHARED_METADATA,
@@ -1187,5 +1206,10 @@ BUILTIN_TABLES = (
     + MEMORY_TABLES
     + STATISTICS_TABLES
     + RECURRENCE_TABLES
-    + (ARTIFACT_TAGS_TABLE, DREAM_RUNS_TABLE, RECEIPT_MIGRATION_REVIEW_TABLE)
+    + (
+        ARTIFACT_TAGS_TABLE,
+        DREAM_RUNS_TABLE,
+        RECEIPT_MIGRATION_REVIEW_TABLE,
+        SOURCE_LIFECYCLE_NODES_TABLE,
+    )
 )
