@@ -143,6 +143,7 @@ from powercontext.builtin.persistence.artifact_governance import (
     ArtifactGovernance,
     ArtifactLifecycleState,
 )
+from powercontext.builtin.persistence.database import AsyncDatabase
 from powercontext.builtin.persistence.skill_publications import SkillPublication
 from powercontext.builtin.publication import ArtifactPublicationApplication
 from powercontext.builtin.records import (
@@ -248,6 +249,7 @@ from powercontext.builtin.runtime.recall_sufficiency import (
     build_recall_candidates,
     recall_effort,
 )
+from powercontext.builtin.runtime.source_lifecycle import SourceLifecycleApplication
 from powercontext.builtin.runtime.statistics import RelationalScopedStatistics, overview_selection
 from powercontext.builtin.scope import ScopeApplication, ScopeDescriptor, ScopeSelection
 from powercontext.builtin.scope.subject_sources import SubjectSourceService
@@ -2634,7 +2636,7 @@ class ScopedTopicMemoryApplication:
         self._runtime = runtime
         self.scope_id = validate_scope_id(scope_id)
 
-    async def search(
+    async def search(  # noqa: C901 - validation, fallback, lifecycle filtering, and observation share one boundary
         self,
         request: SearchTopicMemoryRequest,
         /,
@@ -2681,6 +2683,17 @@ class ScopedTopicMemoryApplication:
                     admission,
                     query_embedding,
                     embedding_timeout_seconds,
+                )
+        lifecycle = self._runtime.lifecycle
+        if lifecycle is not None:
+            inactive_topic_ids = await lifecycle.inactive_topic_ids(self.scope_id)
+            if inactive_topic_ids:
+                result = result.model_copy(
+                    update={
+                        "hits": tuple(
+                            hit for hit in result.hits if hit.artifact_ref.artifact_id not in inactive_topic_ids
+                        )
+                    }
                 )
         observer = self._runtime._topic_memory_search_observer
         if observer is not None:
@@ -3041,6 +3054,7 @@ class BuiltinRuntime:
         scheduled_experience_runner: ScheduledExperienceRunner | None = None,
         remote_ingestion: RemoteIngestion | None = None,
         dream_service: DreamService | None = None,
+        lifecycle_database: AsyncDatabase | None = None,
         generation_concurrency: int = 4,
     ) -> None:
         if source_window_limit < 1:
@@ -3125,6 +3139,7 @@ class BuiltinRuntime:
         self.work = WorkApplication(self)
         self.memory = MemoryApplication(self)
         self.topic_memory = TopicMemoryApplication(self)
+        self.lifecycle = None if lifecycle_database is None else SourceLifecycleApplication(self, lifecycle_database)
         self.records = RecordApplication(self)
         self.prompts = PromptApplication(self)
         self.review = ReviewApplication(self)
