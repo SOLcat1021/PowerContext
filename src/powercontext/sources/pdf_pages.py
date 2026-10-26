@@ -22,6 +22,7 @@ import io
 import math
 import re
 from collections import Counter
+from itertools import pairwise
 from typing import Any
 from urllib.parse import quote
 
@@ -150,6 +151,7 @@ async def search_pdf_pages(memory: Any, question: str, limit: int = 10) -> tuple
     result_sets, query_weights, informative_terms = await _pdf_search_candidates(
         memory, question, section_cues, candidate_limit
     )
+    document_pages = await _pdf_document_pages(memory, result_sets, limit=min(max(limit * 100, 1200), 4096))
     fused_scores: dict[tuple[str, int, str, str], float] = {}
     fused_hits: dict[tuple[str, int, str, str], MemoryHit] = {}
     rank_constant = 60
@@ -159,6 +161,10 @@ async def search_pdf_pages(memory: Any, question: str, limit: int = 10) -> tuple
             identity = _pdf_hit_identity(hit)
             fused_scores[identity] = fused_scores.get(identity, 0.0) + query_weight / (rank_constant + rank)
             fused_hits.setdefault(identity, hit)
+    for hit in document_pages:
+        identity = _pdf_hit_identity(hit)
+        fused_scores.setdefault(identity, 0.0)
+        fused_hits.setdefault(identity, hit)
 
     # A long financial question can need several distinct statements. Keep the
     # actual section pages found through Memory in the result before filling the
@@ -169,12 +175,12 @@ async def search_pdf_pages(memory: Any, question: str, limit: int = 10) -> tuple
             identity = _pdf_hit_identity(hit)
             if identity not in anchors:
                 anchors.append(identity)
-    lexical_scores = _pdf_lexical_scores(fused_hits, informative_terms)
+    page_scores = _pdf_page_scores(fused_hits, informative_terms)
     peak_fusion = max(fused_scores.values(), default=1.0)
     ranked = sorted(
         fused_scores,
         key=lambda identity: (
-            -(0.7 * fused_scores[identity] / peak_fusion + 0.3 * lexical_scores[identity]),
+            -(0.4 * fused_scores[identity] / peak_fusion + 0.6 * page_scores[identity]),
             identity,
         ),
     )
@@ -229,31 +235,75 @@ async def _pdf_search_candidates(
     return result_sets, query_weights, informative_terms
 
 
+async def _pdf_document_pages(
+    memory: Any, result_sets: dict[str, tuple[MemoryHit, ...]], *, limit: int
+) -> tuple[MemoryHit, ...]:
+    """Broaden page coverage using the document ID projected into every page."""
+
+    document_ids = {
+        document_id for hits in result_sets.values() for hit in hits if (document_id := hit.text.partition("\n")[0])
+    }
+    pages: dict[tuple[str, int, str, str], MemoryHit] = {}
+    for document_id in sorted(document_ids):
+        hits = (await memory.search(SearchMemoryRequest(query=document_id, mode="fts", limit=limit))).hits
+        for hit in hits:
+            if hit.text.partition("\n")[0] == document_id:
+                pages.setdefault(_pdf_hit_identity(hit), hit)
+    return tuple(pages.values())
+
+
 def _pdf_hit_identity(hit: MemoryHit) -> tuple[str, int, str, str]:
     return (hit.memory_ref.artifact_id, hit.memory_ref.revision, hit.entry_id, hit.entry_version_id)
 
 
-def _pdf_lexical_scores(
+def _pdf_page_scores(
     hits: dict[tuple[str, int, str, str], MemoryHit], terms: tuple[str, ...]
 ) -> dict[tuple[str, int, str, str], float]:
-    """Favor distinctive question vocabulary while discounting repeated filing boilerplate."""
+    """Rank evidence-bearing pages, not pages with scattered filing vocabulary."""
 
     question_terms = set(terms)
-    page_terms = {identity: set(re.findall(r"[a-z]+|\d+", hit.text.casefold())) for identity, hit in hits.items()}
-    document_frequency = Counter(term for tokens in page_terms.values() for term in question_terms & tokens)
-    page_count = len(page_terms)
+    # The first line is the document ID in the required text projection. Its
+    # words appear on every page and provide no page-level evidence.
+    page_tokens = {
+        identity: re.findall(r"[a-z]+|\d+", hit.text.partition("\n")[2].casefold()) for identity, hit in hits.items()
+    }
+    document_frequency = Counter(term for tokens in page_tokens.values() for term in question_terms & set(tokens))
+    page_count = len(page_tokens)
     term_weights = {
-        term: math.log((page_count + 1) / (document_frequency[term] + 1))
-        for term in question_terms
-        if document_frequency[term]
+        term: math.log1p((page_count - frequency + 0.5) / (frequency + 0.5))
+        for term, frequency in document_frequency.items()
     }
     total_weight = sum(term_weights.values())
-    return {
-        identity: (
-            sum(term_weights.get(term, 0.0) for term in question_terms & tokens) / total_weight if total_weight else 0.0
+    if not total_weight:
+        return dict.fromkeys(page_tokens, 0.0)
+
+    query_pairs = tuple(
+        (first, second)
+        for first, second in pairwise(terms)
+        if len(first) >= 3 and len(second) >= 3 and first in term_weights and second in term_weights
+    )
+    scores = {}
+    for identity, tokens in page_tokens.items():
+        present = question_terms & set(tokens)
+        whole_page = sum(term_weights[term] for term in present) / total_weight
+        heading = sum(term_weights[term] for term in question_terms & set(tokens[:70])) / total_weight
+
+        # Search within overlapping passages. A long annual-report page may
+        # contain all query terms in unrelated notes, footers, and tables;
+        # answer-bearing terms tend to occur together in a smaller region.
+        passage = max(
+            (
+                sum(term_weights[term] for term in question_terms & set(tokens[start : start + 160])) / total_weight
+                for start in range(0, len(tokens), 80)
+            ),
+            default=0.0,
         )
-        for identity, tokens in page_terms.items()
-    }
+        adjacent = set(pairwise(tokens))
+        phrase = (
+            sum((first, second) in adjacent for first, second in query_pairs) / len(query_pairs) if query_pairs else 0.0
+        )
+        scores[identity] = 0.25 * whole_page + 0.55 * passage + 0.15 * heading + 0.05 * phrase
+    return scores
 
 
 def _pdf_section_cues(question: str) -> tuple[tuple[str, str, bool, int], ...]:
@@ -262,7 +312,7 @@ def _pdf_section_cues(question: str) -> tuple[tuple[str, str, bool, int], ...]:
     lowered = question.casefold()
     cues = []
     if any(term in lowered for term in ("geograph", "region", "primarily operate")):
-        cues.append(("our operations reportable segments", "our operations", False, 2))
+        cues.append(("our operations reportable segments", "our operations", False, 1))
     if any(term in lowered for term in ("legal", "litigation", "lawsuit", "legal battle")):
         cues.append(("item 3 legal proceedings", "item 3 legal proceedings", False, 1))
     if any(term in lowered for term in ("income statement", "p&l", "profit and loss", "operating income", "ebitda")):
