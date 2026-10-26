@@ -615,6 +615,7 @@ async def open_builtin_runtime(
                     authorization_context=dream_authorization_context,
                     attest_candidate=dream_candidate_attester,
                 ),
+                lifecycle_database=contexts.database,
                 generation_concurrency=config.runtime.generation_concurrency,
                 experience_recall=contexts.search_experience_outcome,
                 skill_recall=contexts.search_skills,
