@@ -151,6 +151,12 @@ async def search_pdf_pages(memory: Any, question: str, limit: int = 10) -> tuple
     result_sets, query_weights, informative_terms = await _pdf_search_candidates(
         memory, question, section_cues, candidate_limit
     )
+    preferred_documents = _pdf_question_documents(question, result_sets)
+    if preferred_documents:
+        result_sets = {
+            query: tuple(hit for hit in hits if _pdf_document_id(hit) in preferred_documents)
+            for query, hits in result_sets.items()
+        }
     document_pages = await _pdf_document_pages(memory, result_sets, limit=min(max(limit * 100, 1200), 4096))
     fused_scores: dict[tuple[str, int, str, str], float] = {}
     fused_hits: dict[tuple[str, int, str, str], MemoryHit] = {}
@@ -250,6 +256,37 @@ async def _pdf_document_pages(
             if hit.text.partition("\n")[0] == document_id:
                 pages.setdefault(_pdf_hit_identity(hit), hit)
     return tuple(pages.values())
+
+
+def _pdf_document_id(hit: MemoryHit) -> str:
+    """The required text projection starts with the source document ID."""
+
+    return hit.text.partition("\n")[0]
+
+
+def _pdf_question_documents(question: str, result_sets: dict[str, tuple[MemoryHit, ...]]) -> frozenset[str]:
+    """Prefer a filing when its company ID is explicitly named in the question.
+
+    When a question names several companies or none, retain the full scoped
+    search rather than guessing a document from ranking order.
+    """
+
+    document_ids = {_pdf_document_id(hit) for hits in result_sets.values() for hit in hits}
+    question_text = question.casefold()
+    compact_question = "".join(re.findall(r"[a-z0-9]+", question_text))
+    matched: dict[str, set[str]] = {}
+    for document_id in document_ids:
+        company = re.split(r"[_-](?:19|20)\d{2}(?:[_-]|$)", document_id, maxsplit=1)[0]
+        company_key = "".join(re.findall(r"[a-z0-9]+", company.casefold()))
+        if not company_key:
+            continue
+        if len(company_key) <= 4:
+            named = bool(re.search(rf"(?<![a-z0-9]){re.escape(company_key)}(?![a-z0-9])", question_text))
+        else:
+            named = company_key in compact_question
+        if named:
+            matched.setdefault(company_key, set()).add(document_id)
+    return frozenset(next(iter(matched.values()))) if len(matched) == 1 else frozenset()
 
 
 def _pdf_hit_identity(hit: MemoryHit) -> tuple[str, int, str, str]:
