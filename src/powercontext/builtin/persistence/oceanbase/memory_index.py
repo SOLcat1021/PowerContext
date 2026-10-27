@@ -32,6 +32,7 @@ from sqlalchemy import (
 from sqlalchemy.dialects.mysql import match
 from sqlalchemy.ext.asyncio import AsyncConnection
 from sqlalchemy.sql.elements import TextClause
+from typing_extensions import override
 
 from powercontext.artifacts import ArtifactRef
 from powercontext.builtin.artifacts.memory import (
@@ -98,6 +99,9 @@ WHERE m.scope_id = :scope_id
 ORDER BY l2_distance(m.embedding, :query_vector) APPROXIMATE
 LIMIT :candidate_limit
 """
+# Keep each channel's text join and native ranking before assigning its ordinal.
+# Re-sorting a combined result by distance/identity changes tied ANN candidates'
+# reciprocal ranks, and can even change which entries reach the final limit.
 _OCEANBASE_HYBRID_SEARCH_SQL = """
 WITH fts_candidates AS (
     SELECT
@@ -106,8 +110,13 @@ WITH fts_candidates AS (
         f.head_revision,
         f.entry_id,
         f.entry_version_id,
+        v.text,
         MATCH(f.searchable_text) AGAINST (:analyzed_query) AS relevance
     FROM pc_memory_entry_heads AS f
+    JOIN pc_memory_entry_versions AS v
+      ON v.scope_id = f.scope_id
+     AND v.memory_artifact_id = f.memory_artifact_id
+     AND v.entry_version_id = f.entry_version_id
     WHERE f.scope_id = :scope_id
       AND f.memory_artifact_id IN :memory_artifact_ids
       AND MATCH(f.searchable_text) AGAINST (:analyzed_query)
@@ -120,45 +129,50 @@ WITH fts_candidates AS (
         m.head_revision,
         m.entry_id,
         m.entry_version_id,
+        v.text,
         l2_distance(m.embedding, :query_vector) AS distance
     FROM pc_memory_vector_entries AS m
+    JOIN pc_memory_entry_versions AS v
+      ON v.scope_id = m.scope_id
+     AND v.memory_artifact_id = m.memory_artifact_id
+     AND v.entry_version_id = m.entry_version_id
     WHERE m.scope_id = :scope_id
       AND m.memory_artifact_id IN :memory_artifact_ids
     ORDER BY l2_distance(m.embedding, :query_vector) APPROXIMATE
     LIMIT :candidate_limit
+), ranked_fts AS (
+    SELECT c.*, ROW_NUMBER() OVER () AS candidate_rank
+    FROM fts_candidates AS c
+), ranked_vector AS (
+    SELECT c.*, ROW_NUMBER() OVER () AS candidate_rank
+    FROM vector_candidates AS c
 )
 SELECT
     0 AS channel_order,
     'fts' AS channel,
+    c.candidate_rank,
     c.memory_artifact_id,
     c.head_revision,
     c.entry_id,
     c.entry_version_id,
-    v.text,
+    c.text,
     NULL AS distance,
     c.relevance
-FROM fts_candidates AS c
-JOIN pc_memory_entry_versions AS v
-  ON v.scope_id = c.scope_id
- AND v.memory_artifact_id = c.memory_artifact_id
- AND v.entry_version_id = c.entry_version_id
+FROM ranked_fts AS c
 UNION ALL
 SELECT
     1 AS channel_order,
     'vector' AS channel,
+    c.candidate_rank,
     c.memory_artifact_id,
     c.head_revision,
     c.entry_id,
     c.entry_version_id,
-    v.text,
+    c.text,
     c.distance,
     NULL AS relevance
-FROM vector_candidates AS c
-JOIN pc_memory_entry_versions AS v
-  ON v.scope_id = c.scope_id
- AND v.memory_artifact_id = c.memory_artifact_id
- AND v.entry_version_id = c.entry_version_id
-ORDER BY channel_order, relevance DESC, distance, memory_artifact_id, entry_id, entry_version_id
+FROM ranked_vector AS c
+ORDER BY channel_order, candidate_rank
 """
 
 
@@ -568,6 +582,7 @@ class OceanBaseMemoryHybridIndex(CompositeMemoryIndex):
         self._hybrid_search_sql = _hybrid_search_statement(profile, tagged=False)
         self._tagged_hybrid_search_sql = _hybrid_search_statement(profile, tagged=True)
 
+    @override
     async def search(
         self,
         connection: AsyncConnection,
