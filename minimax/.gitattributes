@@ -1,0 +1,6 @@
+*.py text eol=lf
+*.json text eol=lf
+# Raw unified-diff context and rendered logs intentionally preserve blank lines.
+evidence/*.patch -text -whitespace
+evidence/*.html -text -whitespace
+*.jpg binary

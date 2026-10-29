@@ -1,0 +1,304 @@
+<!doctype html><html><meta charset="utf-8"><title>MiniMax SDD evidence</title>
+<style>body{margin:40px auto;max-width:1100px;background:#eef2f7;color:#172333;font:16px system-ui}
+h1{color:#153b72}section{background:white;padding:22px;margin:20px 0;border-radius:12px}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#102236;color:#e2efff;padding:18px;font:14px Consolas,monospace}
+p{color:#526275}h2{font-size:21px}</style>
+<h1>MiniMax · SDD engineering context</h1><p>Evidence viewer generated from actual execution logs. This page is not the MiniMax product UI.</p><section><h2>Actual run summary</h2><p>Model: MiniMax-M3.1-Flash · Run: exec_turn_mvt35hbx_jb8agc</p><p>Before target exit code: 1 · After all tests exit code: 0</p><pre>test_all_tasks (test_tasks.RegressionTests) ... ok
+test_empty (test_tasks.RegressionTests) ... ok
+test_no_alias (test_tasks.RegressionTests) ... ok
+test_status (test_tasks.RegressionTests) ... ok
+test_combined (test_tasks.TargetTests) ... ok
+test_invalid (test_tasks.TargetTests) ... ok
+test_invalid_even_empty (test_tasks.TargetTests) ... ok
+test_none (test_tasks.TargetTests) ... ok
+test_preserve_input (test_tasks.TargetTests) ... ok
+test_priority (test_tasks.TargetTests) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.000s
+
+OK
+</pre></section><section><h2>Before: regression tests</h2><p>Source: evidence/before-regression.json</p><pre>{
+  &quot;command&quot;: [
+    &quot;C:\\Users\\39253\\miniconda3\\python.exe&quot;,
+    &quot;-m&quot;,
+    &quot;unittest&quot;,
+    &quot;-v&quot;,
+    &quot;test_tasks.RegressionTests&quot;
+  ],
+  &quot;exit_code&quot;: 0,
+  &quot;stdout&quot;: &quot;&quot;,
+  &quot;stderr&quot;: &quot;test_all_tasks (test_tasks.RegressionTests) ... ok\ntest_empty (test_tasks.RegressionTests) ... ok\ntest_no_alias (test_tasks.RegressionTests) ... ok\ntest_status (test_tasks.RegressionTests) ... ok\n\n----------------------------------------------------------------------\nRan 4 tests in 0.000s\n\nOK\n&quot;,
+  &quot;source_sha256&quot;: &quot;3e9c861795faa01637cbedff558a5b1a0d2c5859ca343f30d1eefc5b3481e34d&quot;,
+  &quot;tests_sha256&quot;: &quot;24f0ab42ea812a2b6c098a3b9f965ccefba8bf70c86543de2589a2b90ec18c2d&quot;
+}
+</pre></section><section><h2>Before: target feature tests</h2><p>Source: evidence/before-target.json</p><pre>{
+  &quot;command&quot;: [
+    &quot;C:\\Users\\39253\\miniconda3\\python.exe&quot;,
+    &quot;-m&quot;,
+    &quot;unittest&quot;,
+    &quot;-v&quot;,
+    &quot;test_tasks.TargetTests&quot;
+  ],
+  &quot;exit_code&quot;: 1,
+  &quot;stdout&quot;: &quot;&quot;,
+  &quot;stderr&quot;: &quot;test_combined (test_tasks.TargetTests) ... ERROR\ntest_invalid (test_tasks.TargetTests) ... ERROR\ntest_invalid_even_empty (test_tasks.TargetTests) ... ERROR\ntest_none (test_tasks.TargetTests) ... ERROR\ntest_preserve_input (test_tasks.TargetTests) ... ERROR\ntest_priority (test_tasks.TargetTests) ... ERROR\n\n======================================================================\nERROR: test_combined (test_tasks.TargetTests)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \&quot;E:\\CodexP\\OceanBase\\PowerContext-minimax\\minimax\\sample\\test_tasks.py\&quot;, line 35, in test_combined\n    self.assertEqual([t[\&quot;id\&quot;] for t in list_tasks(DATA, \&quot;open\&quot;, priority=\&quot;low\&quot;)], [3])\nTypeError: list_tasks() got an unexpected keyword argument &#x27;priority&#x27;\n\n======================================================================\nERROR: test_invalid (test_tasks.TargetTests)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \&quot;E:\\CodexP\\OceanBase\\PowerContext-minimax\\minimax\\sample\\test_tasks.py\&quot;, line 42, in test_invalid\n    list_tasks(DATA, priority=\&quot;urgent\&quot;)\nTypeError: list_tasks() got an unexpected keyword argument &#x27;priority&#x27;\n\n======================================================================\nERROR: test_invalid_even_empty (test_tasks.TargetTests)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \&quot;E:\\CodexP\\OceanBase\\PowerContext-minimax\\minimax\\sample\\test_tasks.py\&quot;, line 46, in test_invalid_even_empty\n    list_tasks([], priority=\&quot;urgent\&quot;)\nTypeError: list_tasks() got an unexpected keyword argument &#x27;priority&#x27;\n\n======================================================================\nERROR: test_none (test_tasks.TargetTests)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \&quot;E:\\CodexP\\OceanBase\\PowerContext-minimax\\minimax\\sample\\test_tasks.py\&quot;, line 38, in test_none\n    self.assertEqual(list_tasks(DATA, priority=None), DATA)\nTypeError: list_tasks() got an unexpected keyword argument &#x27;priority&#x27;\n\n======================================================================\nERROR: test_preserve_input (test_tasks.TargetTests)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \&quot;E:\\CodexP\\OceanBase\\PowerContext-minimax\\minimax\\sample\\test_tasks.py\&quot;, line 50, in test_preserve_input\n    result = list_tasks(DATA, priority=\&quot;high\&quot;)\nTypeError: list_tasks() got an unexpected keyword argument &#x27;priority&#x27;\n\n======================================================================\nERROR: test_priority (test_tasks.TargetTests)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \&quot;E:\\CodexP\\OceanBase\\PowerContext-minimax\\minimax\\sample\\test_tasks.py\&quot;, line 32, in test_priority\n    self.assertEqual([t[\&quot;id\&quot;] for t in list_tasks(DATA, priority=\&quot;high\&quot;)], [1, 4])\nTypeError: list_tasks() got an unexpected keyword argument &#x27;priority&#x27;\n\n----------------------------------------------------------------------\nRan 6 tests in 0.001s\n\nFAILED (errors=6)\n&quot;,
+  &quot;source_sha256&quot;: &quot;3e9c861795faa01637cbedff558a5b1a0d2c5859ca343f30d1eefc5b3481e34d&quot;,
+  &quot;tests_sha256&quot;: &quot;24f0ab42ea812a2b6c098a3b9f965ccefba8bf70c86543de2589a2b90ec18c2d&quot;
+}
+</pre></section><section><h2>MiniMax official CLI result</h2><p>Source: evidence/minimax-response.json</p><pre>{
+  &quot;schemaVersion&quot;: 1,
+  &quot;type&quot;: &quot;exec.result&quot;,
+  &quot;runId&quot;: &quot;exec_turn_mvt35hbx_jb8agc&quot;,
+  &quot;sessionId&quot;: &quot;mvs_317888d061f24bd1bbbbdfaba06ac434&quot;,
+  &quot;turnId&quot;: &quot;turn_mvt35hbx_jb8agc&quot;,
+  &quot;status&quot;: &quot;succeeded&quot;,
+  &quot;output&quot;: &quot;TASK-PRIORITY 已实现，全部 10 个测试通过。\n\n## 变更说明\n\n只修改了 `sample/tasks.py`（`spec.md` 与 `test_tasks.py` 的 SHA256 与规格中给出的完全一致，未被改动）。\n\n新的 `list_tasks` 签名：\n\n```python\ndef list_tasks(tasks, status=None, priority=None):\n```\n\n关键点：\n\n1. **参数校验前置** — `priority` 非 `None` 且不在 `(\&quot;high\&quot;, \&quot;medium\&quot;, \&quot;low\&quot;)` 中时立即抛出 `ValueError`，校验发生在遍历输入之前，因此 `list_tasks([], priority=\&quot;urgent\&quot;)` 同样报错（满足 `test_invalid_even_empty`）。\n2. **AND 语义过滤** — `status` 与 `priority` 条件同时成立才保留；`priority=None` 时短路跳过该条件，等价于旧行为。\n3. **保持兼容性与顺序** — `status` 仍为第二位置参数，`list_tasks(DATA, \&quot;open\&quot;, priority=\&quot;low\&quot;)` 的位置调用可用；返回列表保持输入顺序。\n4. **拷贝语义不变** — 仍返回 `dict(task)` 副本，输入对象不被修改（`test_preserve_input` / `test_no_alias` 通过）。\n5. 过滤时用 `task.get(\&quot;priority\&quot;)` 而非 `task[\&quot;priority\&quot;]`，避免缺少该字段的任务触发 `KeyError`。\n\n## 验证结果\n\n```\ntest_all_tasks (RegressionTests) ... ok\ntest_empty (RegressionTests) ... ok\ntest_no_alias (RegressionTests) ... ok\ntest_status (RegressionTests) ... ok\ntest_combined (TargetTests) ... ok\ntest_invalid (TargetTests) ... ok\ntest_invalid_even_empty (TargetTests) ... ok\ntest_none (TargetTests) ... ok\ntest_preserve_input (TargetTests) ... ok\ntest_priority (TargetTests) ... ok\nRan 10 tests in 0.000s — OK\n```\n\n未安装任何依赖、未访问网络、未触碰凭据。\n\n&lt;deliver-assets&gt;\n&lt;media type=\&quot;file\&quot; src=\&quot;E:\\CodexP\\OceanBase\\PowerContext-minimax\\minimax\\sample\\tasks.py\&quot; caption=\&quot;实现 priority 过滤后的 tasks.py\&quot; /&gt;\n&lt;/deliver-assets&gt;&quot;,
+  &quot;model&quot;: {
+    &quot;providerId&quot;: &quot;minimax&quot;,
+    &quot;modelId&quot;: &quot;MiniMax-M3.1-Flash&quot;,
+    &quot;variant&quot;: &quot;thinking&quot;,
+    &quot;providerSource&quot;: &quot;provider&quot;,
+    &quot;providerKind&quot;: &quot;minimax-managed&quot;
+  },
+  &quot;usage&quot;: {
+    &quot;inputTokens&quot;: 20470,
+    &quot;outputTokens&quot;: 1990,
+    &quot;cacheReadTokens&quot;: 112128,
+    &quot;totalTokens&quot;: 22460
+  },
+  &quot;usageSource&quot;: &quot;completed_responses&quot;,
+  &quot;usageIncomplete&quot;: false,
+  &quot;durationMs&quot;: 31905
+}</pre></section><section><h2>Actual generated code diff</h2><p>Source: evidence/minimax.patch</p><pre>--- before/tasks.py
++++ after/tasks.py
+@@ -1,6 +1,25 @@
+-&quot;&quot;&quot;Small task-list business module, before the requested priority-filter change.&quot;&quot;&quot;
++&quot;&quot;&quot;Small task-list business module, with optional status/priority filtering.&quot;&quot;&quot;
++
++VALID_PRIORITIES = (&quot;high&quot;, &quot;medium&quot;, &quot;low&quot;)
+ 
+ 
+-def list_tasks(tasks, status=None):
+-    &quot;&quot;&quot;Return tasks in their original order, optionally filtered by status.&quot;&quot;&quot;
+-    return [dict(task) for task in tasks if status is None or task[&quot;status&quot;] == status]
++def list_tasks(tasks, status=None, priority=None):
++    &quot;&quot;&quot;Return tasks in their original order, optionally filtered by status and priority.
++
++    ``status`` keeps its positional-call compatibility. ``priority`` accepts
++    ``high``, ``medium``, ``low`` or None; any other value raises ValueError
++    (even when no task is supplied). Returned tasks are copies, so the input
++    is never mutated.
++    &quot;&quot;&quot;
++    if priority is not None and priority not in VALID_PRIORITIES:
++        raise ValueError(
++            &quot;invalid priority {!r}: expected one of {} or None&quot;.format(
++                priority, &quot;, &quot;.join(VALID_PRIORITIES)
++            )
++        )
++    return [
++        dict(task)
++        for task in tasks
++        if (status is None or task[&quot;status&quot;] == status)
++        and (priority is None or task.get(&quot;priority&quot;) == priority)
++    ]
+</pre></section><section><h2>After: unchanged tests</h2><p>Source: evidence/after-all.json</p><pre>{
+  &quot;command&quot;: [
+    &quot;C:\\Users\\39253\\miniconda3\\python.exe&quot;,
+    &quot;-m&quot;,
+    &quot;unittest&quot;,
+    &quot;-v&quot;
+  ],
+  &quot;exit_code&quot;: 0,
+  &quot;stdout&quot;: &quot;&quot;,
+  &quot;stderr&quot;: &quot;test_all_tasks (test_tasks.RegressionTests) ... ok\ntest_empty (test_tasks.RegressionTests) ... ok\ntest_no_alias (test_tasks.RegressionTests) ... ok\ntest_status (test_tasks.RegressionTests) ... ok\ntest_combined (test_tasks.TargetTests) ... ok\ntest_invalid (test_tasks.TargetTests) ... ok\ntest_invalid_even_empty (test_tasks.TargetTests) ... ok\ntest_none (test_tasks.TargetTests) ... ok\ntest_preserve_input (test_tasks.TargetTests) ... ok\ntest_priority (test_tasks.TargetTests) ... ok\n\n----------------------------------------------------------------------\nRan 10 tests in 0.000s\n\nOK\n&quot;,
+  &quot;source_sha256&quot;: &quot;85a89e79c4f3414f8ec583b20f0bdd91ed5fecabcd8164ab4ebe91bbcf4df45c&quot;,
+  &quot;tests_sha256&quot;: &quot;24f0ab42ea812a2b6c098a3b9f965ccefba8bf70c86543de2589a2b90ec18c2d&quot;
+}
+</pre></section><section><h2>State recovered after restart</h2><p>Source: evidence/recovered.json</p><pre>{
+  &quot;fresh_process&quot;: true,
+  &quot;result&quot;: {
+    &quot;memory&quot;: {
+      &quot;family&quot;: &quot;memory&quot;,
+      &quot;artifact_id&quot;: &quot;memory&quot;,
+      &quot;revision&quot;: 1
+    },
+    &quot;mode&quot;: &quot;fts&quot;,
+    &quot;hits&quot;: [
+      {
+        &quot;citation&quot;: {
+          &quot;memory_ref&quot;: {
+            &quot;family&quot;: &quot;memory&quot;,
+            &quot;artifact_id&quot;: &quot;memory&quot;,
+            &quot;revision&quot;: 1
+          },
+          &quot;entry_id&quot;: &quot;mem_ent_494a95e7f7d949d09d996c3df73794a6&quot;,
+          &quot;entry_version_id&quot;: &quot;mem_ver_27b60dc717bb4627b3fcd09526278cbd&quot;
+        },
+        &quot;text&quot;: &quot;minimaxprogress\n{\&quot;task\&quot;: \&quot;TASK-PRIORITY\&quot;, \&quot;completed\&quot;: [\&quot;MiniMax code change\&quot;, \&quot;target and regression tests\&quot;], \&quot;todo\&quot;: [\&quot;restart context module and verify persisted state\&quot;, \&quot;spec update verification\&quot;], \&quot;verification\&quot;: \&quot;evidence/after-all.json\&quot;, \&quot;model\&quot;: {\&quot;providerId\&quot;: \&quot;minimax\&quot;, \&quot;modelId\&quot;: \&quot;MiniMax-M3.1-Flash\&quot;, \&quot;variant\&quot;: \&quot;thinking\&quot;, \&quot;providerSource\&quot;: \&quot;provider\&quot;, \&quot;providerKind\&quot;: \&quot;minimax-managed\&quot;}}&quot;,
+        &quot;score&quot;: 0.01639344262295082,
+        &quot;matched_by&quot;: [
+          &quot;fts&quot;
+        ]
+      }
+    ]
+  }
+}
+</pre></section><section><h2>Specification update and re-import</h2><p>Source: evidence/spec-update.json</p><pre>{
+  &quot;marker&quot;: &quot;specrevision48f9e243688f43efac34be2102d24b51&quot;,
+  &quot;fresh_import&quot;: true,
+  &quot;context&quot;: {
+    &quot;task&quot;: &quot;task priority filter&quot;,
+    &quot;active_import&quot;: {
+      &quot;material_scope&quot;: &quot;scp_6b6w111tt2y2fbzg6smn613dfs&quot;,
+      &quot;state_scope&quot;: &quot;scp_0mrz34hqe37p5y8arwv31tjcw1&quot;,
+      &quot;batch&quot;: &quot;ad3bd4748d90468384ee29f1b6a31a79&quot;
+    },
+    &quot;sources&quot;: [
+      {
+        &quot;path&quot;: &quot;sample/tasks.py&quot;,
+        &quot;sha256&quot;: &quot;85a89e79c4f3414f8ec583b20f0bdd91ed5fecabcd8164ab4ebe91bbcf4df45c&quot;,
+        &quot;content&quot;: &quot;\&quot;\&quot;\&quot;Small task-list business module, with optional status/priority filtering.\&quot;\&quot;\&quot;\n\nVALID_PRIORITIES = (\&quot;high\&quot;, \&quot;medium\&quot;, \&quot;low\&quot;)\n\n\ndef list_tasks(tasks, status=None, priority=None):\n    \&quot;\&quot;\&quot;Return tasks in their original order, optionally filtered by status and priority.\n\n    ``status`` keeps its positional-call compatibility. ``priority`` accepts\n    ``high``, ``medium``, ``low`` or None; any other value raises ValueError\n    (even when no task is supplied). Returned tasks are copies, so the input\n    is never mutated.\n    \&quot;\&quot;\&quot;\n    if priority is not None and priority not in VALID_PRIORITIES:\n        raise ValueError(\n            \&quot;invalid priority {!r}: expected one of {} or None\&quot;.format(\n                priority, \&quot;, \&quot;.join(VALID_PRIORITIES)\n            )\n        )\n    return [\n        dict(task)\n        for task in tasks\n        if (status is None or task[\&quot;status\&quot;] == status)\n        and (priority is None or task.get(\&quot;priority\&quot;) == priority)\n    ]\n&quot;
+      },
+      {
+        &quot;path&quot;: &quot;sample/spec.md&quot;,
+        &quot;sha256&quot;: &quot;de660eb87884a94d1ec4f7aff83cd377f9fd75e286654ec6f9f9f42432a121dc&quot;,
+        &quot;content&quot;: &quot;# TASK-PRIORITY: task priority filter, revision 1\n\nAdd an optional `priority=None` parameter to `tasks.py:list_tasks`.\nAccepted values are `high`, `medium`, `low` and None. Reject other values with\nValueError, including when the input list is empty. Filter status AND priority\nwhen both are given. Preserve input order, status positional-call compatibility,\nempty-input behavior and copy-on-return semantics. Never mutate input tasks.\n\nRequired sources: this specification; tasks.py:list_tasks; test_tasks.py:TargetTests;\ntest_tasks.py:RegressionTests. These tests must remain identical before and after.\n\nUpdated clarification: medium priority is supported. Revision specrevision48f9e243688f43efac34be2102d24b51\n&quot;
+      },
+      {
+        &quot;path&quot;: &quot;sample/test_tasks.py&quot;,
+        &quot;sha256&quot;: &quot;24f0ab42ea812a2b6c098a3b9f965ccefba8bf70c86543de2589a2b90ec18c2d&quot;,
+        &quot;content&quot;: &quot;import unittest\n\nfrom tasks import list_tasks\n\n\nDATA = [\n    {\&quot;id\&quot;: 1, \&quot;status\&quot;: \&quot;open\&quot;, \&quot;priority\&quot;: \&quot;high\&quot;},\n    {\&quot;id\&quot;: 2, \&quot;status\&quot;: \&quot;done\&quot;, \&quot;priority\&quot;: \&quot;low\&quot;},\n    {\&quot;id\&quot;: 3, \&quot;status\&quot;: \&quot;open\&quot;, \&quot;priority\&quot;: \&quot;low\&quot;},\n    {\&quot;id\&quot;: 4, \&quot;status\&quot;: \&quot;done\&quot;, \&quot;priority\&quot;: \&quot;high\&quot;},\n]\n\n\nclass RegressionTests(unittest.TestCase):\n    def test_all_tasks(self):\n        self.assertEqual(list_tasks(DATA), DATA)\n\n    def test_status(self):\n        self.assertEqual([t[\&quot;id\&quot;] for t in list_tasks(DATA, \&quot;open\&quot;)], [1, 3])\n\n    def test_empty(self):\n        self.assertEqual(list_tasks([]), [])\n\n    def test_no_alias(self):\n        result = list_tasks(DATA)\n        result[0][\&quot;status\&quot;] = \&quot;changed\&quot;\n        self.assertEqual(DATA[0][\&quot;status\&quot;], \&quot;open\&quot;)\n\n\nclass TargetTests(unittest.TestCase):\n    def test_priority(self):\n        self.assertEqual([t[\&quot;id\&quot;] for t in list_tasks(DATA, priority=\&quot;high\&quot;)], [1, 4])\n\n    def test_combined(self):\n        self.assertEqual([t[\&quot;id\&quot;] for t in list_tasks(DATA, \&quot;open\&quot;, priority=\&quot;low\&quot;)], [3])\n\n    def test_none(self):\n        self.assertEqual(list_tasks(DATA, priority=None), DATA)\n\n    def test_invalid(self):\n        with self.assertRaises(ValueError):\n            list_tasks(DATA, priority=\&quot;urgent\&quot;)\n\n    def test_invalid_even_empty(self):\n        with self.assertRaises(ValueError):\n            list_tasks([], priority=\&quot;urgent\&quot;)\n\n    def test_preserve_input(self):\n        original = [dict(t) for t in DATA]\n        result = list_tasks(DATA, priority=\&quot;high\&quot;)\n        result[0][\&quot;priority\&quot;] = \&quot;low\&quot;\n        self.assertEqual(DATA, original)\n\n\nif __name__ == \&quot;__main__\&quot;:\n    unittest.main()\n&quot;
+      }
+    ],
+    &quot;previous_progress&quot;: {
+      &quot;memory&quot;: {
+        &quot;family&quot;: &quot;memory&quot;,
+        &quot;artifact_id&quot;: &quot;memory&quot;,
+        &quot;revision&quot;: 1
+      },
+      &quot;mode&quot;: &quot;fts&quot;,
+      &quot;hits&quot;: [
+        {
+          &quot;citation&quot;: {
+            &quot;memory_ref&quot;: {
+              &quot;family&quot;: &quot;memory&quot;,
+              &quot;artifact_id&quot;: &quot;memory&quot;,
+              &quot;revision&quot;: 1
+            },
+            &quot;entry_id&quot;: &quot;mem_ent_494a95e7f7d949d09d996c3df73794a6&quot;,
+            &quot;entry_version_id&quot;: &quot;mem_ver_27b60dc717bb4627b3fcd09526278cbd&quot;
+          },
+          &quot;text&quot;: &quot;minimaxprogress\n{\&quot;task\&quot;: \&quot;TASK-PRIORITY\&quot;, \&quot;completed\&quot;: [\&quot;MiniMax code change\&quot;, \&quot;target and regression tests\&quot;], \&quot;todo\&quot;: [\&quot;restart context module and verify persisted state\&quot;, \&quot;spec update verification\&quot;], \&quot;verification\&quot;: \&quot;evidence/after-all.json\&quot;, \&quot;model\&quot;: {\&quot;providerId\&quot;: \&quot;minimax\&quot;, \&quot;modelId\&quot;: \&quot;MiniMax-M3.1-Flash\&quot;, \&quot;variant\&quot;: \&quot;thinking\&quot;, \&quot;providerSource\&quot;: \&quot;provider\&quot;, \&quot;providerKind\&quot;: \&quot;minimax-managed\&quot;}}&quot;,
+          &quot;score&quot;: 0.01639344262295082,
+          &quot;matched_by&quot;: [
+            &quot;fts&quot;
+          ]
+        }
+      ]
+    },
+    &quot;database_query&quot;: {
+      &quot;memory&quot;: {
+        &quot;family&quot;: &quot;memory&quot;,
+        &quot;artifact_id&quot;: &quot;memory&quot;,
+        &quot;revision&quot;: 3
+      },
+      &quot;mode&quot;: &quot;fts&quot;,
+      &quot;hits&quot;: [
+        {
+          &quot;citation&quot;: {
+            &quot;memory_ref&quot;: {
+              &quot;family&quot;: &quot;memory&quot;,
+              &quot;artifact_id&quot;: &quot;memory&quot;,
+              &quot;revision&quot;: 3
+            },
+            &quot;entry_id&quot;: &quot;mem_ent_2caaf475de1d4cb68593dcb54b97d0e1&quot;,
+            &quot;entry_version_id&quot;: &quot;mem_ver_e28651625fc640a28d20c8bb0430b040&quot;
+          },
+          &quot;text&quot;: &quot;task priority filter engineering source\n{\&quot;path\&quot;: \&quot;sample/tasks.py\&quot;, \&quot;sha256\&quot;: \&quot;85a89e79c4f3414f8ec583b20f0bdd91ed5fecabcd8164ab4ebe91bbcf4df45c\&quot;, \&quot;content\&quot;: \&quot;\\\&quot;\\\&quot;\\\&quot;Small task-list business module, with optional status/priority filtering.\\\&quot;\\\&quot;\\\&quot;\\n\\nVALID_PRIORITIES = (\\\&quot;high\\\&quot;, \\\&quot;medium\\\&quot;, \\\&quot;low\\\&quot;)\\n\\n\\ndef list_tasks(tasks, status=None, priority=None):\\n    \\\&quot;\\\&quot;\\\&quot;Return tasks in their original order, optionally filtered by status and priority.\\n\\n    ``status`` keeps its positional-call compatibility. ``priority`` accepts\\n    ``high``, ``medium``, ``low`` or None; any other value raises ValueError\\n    (even when no task is supplied). Returned tasks are copies, so the input\\n    is never mutated.\\n    \\\&quot;\\\&quot;\\\&quot;\\n    if priority is not None and priority not in VALID_PRIORITIES:\\n        raise ValueError(\\n            \\\&quot;invalid priority {!r}: expected one of {} or None\\\&quot;.format(\\n                priority, \\\&quot;, \\\&quot;.join(VALID_PRIORITIES)\\n            )\\n        )\\n    return [\\n        dict(task)\\n        for task in tasks\\n        if (status is None or task[\\\&quot;status\\\&quot;] == status)\\n        and (priority is None or task.get(\\\&quot;priority\\\&quot;) == priority)\\n    ]\\n\&quot;}&quot;,
+          &quot;score&quot;: 0.01639344262295082,
+          &quot;matched_by&quot;: [
+            &quot;fts&quot;
+          ]
+        },
+        {
+          &quot;citation&quot;: {
+            &quot;memory_ref&quot;: {
+              &quot;family&quot;: &quot;memory&quot;,
+              &quot;artifact_id&quot;: &quot;memory&quot;,
+              &quot;revision&quot;: 3
+            },
+            &quot;entry_id&quot;: &quot;mem_ent_a2f02e72b7fe41adb034766e0c7bba4a&quot;,
+            &quot;entry_version_id&quot;: &quot;mem_ver_298325da8a17443db6dc54bb57c813b7&quot;
+          },
+          &quot;text&quot;: &quot;task priority filter engineering source\n{\&quot;path\&quot;: \&quot;sample/spec.md\&quot;, \&quot;sha256\&quot;: \&quot;de660eb87884a94d1ec4f7aff83cd377f9fd75e286654ec6f9f9f42432a121dc\&quot;, \&quot;content\&quot;: \&quot;# TASK-PRIORITY: task priority filter, revision 1\\n\\nAdd an optional `priority=None` parameter to `tasks.py:list_tasks`.\\nAccepted values are `high`, `medium`, `low` and None. Reject other values with\\nValueError, including when the input list is empty. Filter status AND priority\\nwhen both are given. Preserve input order, status positional-call compatibility,\\nempty-input behavior and copy-on-return semantics. Never mutate input tasks.\\n\\nRequired sources: this specification; tasks.py:list_tasks; test_tasks.py:TargetTests;\\ntest_tasks.py:RegressionTests. These tests must remain identical before and after.\\n\\nUpdated clarification: medium priority is supported. Revision specrevision48f9e243688f43efac34be2102d24b51\\n\&quot;}&quot;,
+          &quot;score&quot;: 0.016129032258064516,
+          &quot;matched_by&quot;: [
+            &quot;fts&quot;
+          ]
+        },
+        {
+          &quot;citation&quot;: {
+            &quot;memory_ref&quot;: {
+              &quot;family&quot;: &quot;memory&quot;,
+              &quot;artifact_id&quot;: &quot;memory&quot;,
+              &quot;revision&quot;: 3
+            },
+            &quot;entry_id&quot;: &quot;mem_ent_f59c331585504a9ba48eefee95396419&quot;,
+            &quot;entry_version_id&quot;: &quot;mem_ver_b467d46dbc734759af89d83d7d7836d0&quot;
+          },
+          &quot;text&quot;: &quot;task priority filter engineering source\n{\&quot;path\&quot;: \&quot;sample/test_tasks.py\&quot;, \&quot;sha256\&quot;: \&quot;24f0ab42ea812a2b6c098a3b9f965ccefba8bf70c86543de2589a2b90ec18c2d\&quot;, \&quot;content\&quot;: \&quot;import unittest\\n\\nfrom tasks import list_tasks\\n\\n\\nDATA = [\\n    {\\\&quot;id\\\&quot;: 1, \\\&quot;status\\\&quot;: \\\&quot;open\\\&quot;, \\\&quot;priority\\\&quot;: \\\&quot;high\\\&quot;},\\n    {\\\&quot;id\\\&quot;: 2, \\\&quot;status\\\&quot;: \\\&quot;done\\\&quot;, \\\&quot;priority\\\&quot;: \\\&quot;low\\\&quot;},\\n    {\\\&quot;id\\\&quot;: 3, \\\&quot;status\\\&quot;: \\\&quot;open\\\&quot;, \\\&quot;priority\\\&quot;: \\\&quot;low\\\&quot;},\\n    {\\\&quot;id\\\&quot;: 4, \\\&quot;status\\\&quot;: \\\&quot;done\\\&quot;, \\\&quot;priority\\\&quot;: \\\&quot;high\\\&quot;},\\n]\\n\\n\\nclass RegressionTests(unittest.TestCase):\\n    def test_all_tasks(self):\\n        self.assertEqual(list_tasks(DATA), DATA)\\n\\n    def test_status(self):\\n        self.assertEqual([t[\\\&quot;id\\\&quot;] for t in list_tasks(DATA, \\\&quot;open\\\&quot;)], [1, 3])\\n\\n    def test_empty(self):\\n        self.assertEqual(list_tasks([]), [])\\n\\n    def test_no_alias(self):\\n        result = list_tasks(DATA)\\n        result[0][\\\&quot;status\\\&quot;] = \\\&quot;changed\\\&quot;\\n        self.assertEqual(DATA[0][\\\&quot;status\\\&quot;], \\\&quot;open\\\&quot;)\\n\\n\\nclass TargetTests(unittest.TestCase):\\n    def test_priority(self):\\n        self.assertEqual([t[\\\&quot;id\\\&quot;] for t in list_tasks(DATA, priority=\\\&quot;high\\\&quot;)], [1, 4])\\n\\n    def test_combined(self):\\n        self.assertEqual([t[\\\&quot;id\\\&quot;] for t in list_tasks(DATA, \\\&quot;open\\\&quot;, priority=\\\&quot;low\\\&quot;)], [3])\\n\\n    def test_none(self):\\n        self.assertEqual(list_tasks(DATA, priority=None), DATA)\\n\\n    def test_invalid(self):\\n        with self.assertRaises(ValueError):\\n            list_tasks(DATA, priority=\\\&quot;urgent\\\&quot;)\\n\\n    def test_invalid_even_empty(self):\\n        with self.assertRaises(ValueError):\\n            list_tasks([], priority=\\\&quot;urgent\\\&quot;)\\n\\n    def test_preserve_input(self):\\n        original = [dict(t) for t in DATA]\\n        result = list_tasks(DATA, priority=\\\&quot;high\\\&quot;)\\n        result[0][\\\&quot;priority\\\&quot;] = \\\&quot;low\\\&quot;\\n        self.assertEqual(DATA, original)\\n\\n\\nif __name__ == \\\&quot;__main__\\\&quot;:\\n    unittest.main()\\n\&quot;}&quot;,
+          &quot;score&quot;: 0.015873015873015872,
+          &quot;matched_by&quot;: [
+            &quot;fts&quot;
+          ]
+        }
+      ]
+    }
+  }
+}
+</pre></section><section><h2>Direct seekdb SQL evidence</h2><p>Source: evidence/database.json</p><pre>{
+  &quot;identity&quot;: {
+    &quot;version&quot;: &quot;5.7.25-OceanBase seekdb-v1.3.0.0&quot;,
+    &quot;database_name&quot;: &quot;test&quot;
+  },
+  &quot;query&quot;: &quot;SELECT scope_id, entry_id, kind, text FROM pc_memory_entry_versions WHERE scope_id IN (?, ?)&quot;,
+  &quot;scope_ids&quot;: [
+    &quot;scp_4yfwswv19trwyr3knxtx6n9g0r&quot;,
+    &quot;scp_0mrz34hqe37p5y8arwv31tjcw1&quot;
+  ],
+  &quot;rows&quot;: [
+    {
+      &quot;scope_id&quot;: &quot;scp_0mrz34hqe37p5y8arwv31tjcw1&quot;,
+      &quot;entry_id&quot;: &quot;mem_ent_494a95e7f7d949d09d996c3df73794a6&quot;,
+      &quot;kind&quot;: &quot;task_progress&quot;,
+      &quot;text&quot;: &quot;minimaxprogress\n{\&quot;task\&quot;: \&quot;TASK-PRIORITY\&quot;, \&quot;completed\&quot;: [\&quot;MiniMax code change\&quot;, \&quot;target and regression tests\&quot;], \&quot;todo\&quot;: [\&quot;restart context module and verify persisted state\&quot;, \&quot;spec update verification\&quot;], \&quot;verification\&quot;: \&quot;evidence/after-all.json\&quot;, \&quot;model\&quot;: {\&quot;providerId\&quot;: \&quot;minimax\&quot;, \&quot;modelId\&quot;: \&quot;MiniMax-M3.1-Flash\&quot;, \&quot;variant\&quot;: \&quot;thinking\&quot;, \&quot;providerSource\&quot;: \&quot;provider\&quot;, \&quot;providerKind\&quot;: \&quot;minimax-managed\&quot;}}&quot;
+    },
+    {
+      &quot;scope_id&quot;: &quot;scp_0mrz34hqe37p5y8arwv31tjcw1&quot;,
+      &quot;entry_id&quot;: &quot;mem_ent_dafb2451c6d246b08b0939b820df1a20&quot;,
+      &quot;kind&quot;: &quot;task_progress&quot;,
+      &quot;text&quot;: &quot;minimaxprogress\n{\&quot;task\&quot;: \&quot;TASK-PRIORITY\&quot;, \&quot;completed\&quot;: [\&quot;MiniMax code change\&quot;, \&quot;10 unchanged tests pass\&quot;, \&quot;backend and context module restarted\&quot;, \&quot;state reused in subsequent context\&quot;, \&quot;specification re-import\&quot;], \&quot;todo\&quot;: [], \&quot;verification\&quot;: \&quot;evidence/after-all.json\&quot;}&quot;
+    },
+    {
+      &quot;scope_id&quot;: &quot;scp_4yfwswv19trwyr3knxtx6n9g0r&quot;,
+      &quot;entry_id&quot;: &quot;mem_ent_45600f766a644c76a1f864c33efa0cf5&quot;,
+      &quot;kind&quot;: &quot;engineering_material&quot;,
+      &quot;text&quot;: &quot;task priority filter engineering source\n{\&quot;path\&quot;: \&quot;sample/tasks.py\&quot;, \&quot;sha256\&quot;: \&quot;85a89e79c4f3414f8ec583b20f0bdd91ed5fecabcd8164ab4ebe91bbcf4df45c\&quot;, \&quot;content\&quot;: \&quot;\\\&quot;\\\&quot;\\\&quot;Small task-list business module, with optional status/priority filtering.\\\&quot;\\\&quot;\\\&quot;\\n\\nVALID_PRIORITIES = (\\\&quot;high\\\&quot;, \\\&quot;medium\\\&quot;, \\\&quot;low\\\&quot;)\\n\\n\\ndef list_tasks(tasks, status=None, priority=None):\\n    \\\&quot;\\\&quot;\\\&quot;Return tasks in their original order, optionally filtered by status and priority.\\n\\n    ``status`` keeps its positional-call compatibility. ``priority`` accepts\\n    ``high``, ``medium``, ``low`` or None; any other value raises ValueError\\n    (even when no task is supplied). Returned tasks are copies, so the input\\n    is never mutated.\\n    \\\&quot;\\\&quot;\\\&quot;\\n    if priority is not None and priority not in VALID_PRIORITIES:\\n        raise ValueError(\\n            \\\&quot;invalid priority {!r}: expected one of {} or None\\\&quot;.format(\\n                priority, \\\&quot;, \\\&quot;.join(VALID_PRIORITIES)\\n            )\\n        )\\n    return [\\n        dict(task)\\n        for task in tasks\\n        if (status is None or task[\\\&quot;status\\\&quot;] == status)\\n        and (priority is None or task.get(\\\&quot;priority\\\&quot;) == priority)\\n    ]\\n\&quot;}&quot;
+    },
+    {
+      &quot;scope_id&quot;: &quot;scp_4yfwswv19trwyr3knxtx6n9g0r&quot;,
+      &quot;entry_id&quot;: &quot;mem_ent_f27dcd40af754777a243496b285b9f8a&quot;,
+      &quot;kind&quot;: &quot;engineering_material&quot;,
+      &quot;text&quot;: &quot;task priority filter engineering source\n{\&quot;path\&quot;: \&quot;sample/test_tasks.py\&quot;, \&quot;sha256\&quot;: \&quot;24f0ab42ea812a2b6c098a3b9f965ccefba8bf70c86543de2589a2b90ec18c2d\&quot;, \&quot;content\&quot;: \&quot;import unittest\\n\\nfrom tasks import list_tasks\\n\\n\\nDATA = [\\n    {\\\&quot;id\\\&quot;: 1, \\\&quot;status\\\&quot;: \\\&quot;open\\\&quot;, \\\&quot;priority\\\&quot;: \\\&quot;high\\\&quot;},\\n    {\\\&quot;id\\\&quot;: 2, \\\&quot;status\\\&quot;: \\\&quot;done\\\&quot;, \\\&quot;priority\\\&quot;: \\\&quot;low\\\&quot;},\\n    {\\\&quot;id\\\&quot;: 3, \\\&quot;status\\\&quot;: \\\&quot;open\\\&quot;, \\\&quot;priority\\\&quot;: \\\&quot;low\\\&quot;},\\n    {\\\&quot;id\\\&quot;: 4, \\\&quot;status\\\&quot;: \\\&quot;done\\\&quot;, \\\&quot;priority\\\&quot;: \\\&quot;high\\\&quot;},\\n]\\n\\n\\nclass RegressionTests(unittest.TestCase):\\n    def test_all_tasks(self):\\n        self.assertEqual(list_tasks(DATA), DATA)\\n\\n    def test_status(self):\\n        self.assertEqual([t[\\\&quot;id\\\&quot;] for t in list_tasks(DATA, \\\&quot;open\\\&quot;)], [1, 3])\\n\\n    def test_empty(self):\\n        self.assertEqual(list_tasks([]), [])\\n\\n    def test_no_alias(self):\\n        result = list_tasks(DATA)\\n        result[0][\\\&quot;status\\\&quot;] = \\\&quot;changed\\\&quot;\\n        self.assertEqual(DATA[0][\\\&quot;status\\\&quot;], \\\&quot;open\\\&quot;)\\n\\n\\nclass TargetTests(unittest.TestCase):\\n    def test_priority(self):\\n        self.assertEqual([t[\\\&quot;id\\\&quot;] for t in list_tasks(DATA, priority=\\\&quot;high\\\&quot;)], [1, 4])\\n\\n    def test_combined(self):\\n        self.assertEqual([t[\\\&quot;id\\\&quot;] for t in list_tasks(DATA, \\\&quot;open\\\&quot;, priority=\\\&quot;low\\\&quot;)], [3])\\n\\n    def test_none(self):\\n        self.assertEqual(list_tasks(DATA, priority=None), DATA)\\n\\n    def test_invalid(self):\\n        with self.assertRaises(ValueError):\\n            list_tasks(DATA, priority=\\\&quot;urgent\\\&quot;)\\n\\n    def test_invalid_even_empty(self):\\n        with self.assertRaises(ValueError):\\n            list_tasks([], priority=\\\&quot;urgent\\\&quot;)\\n\\n    def test_preserve_input(self):\\n        original = [dict(t) for t in DATA]\\n        result = list_tasks(DATA, priority=\\\&quot;high\\\&quot;)\\n        result[0][\\\&quot;priority\\\&quot;] = \\\&quot;low\\\&quot;\\n        self.assertEqual(DATA, original)\\n\\n\\nif __name__ == \\\&quot;__main__\\\&quot;:\\n    unittest.main()\\n\&quot;}&quot;
+    },
+    {
+      &quot;scope_id&quot;: &quot;scp_4yfwswv19trwyr3knxtx6n9g0r&quot;,
+      &quot;entry_id&quot;: &quot;mem_ent_dfc13372d445424a966fa1d3f2e2d3e3&quot;,
+      &quot;kind&quot;: &quot;engineering_material&quot;,
+      &quot;text&quot;: &quot;task priority filter engineering source\n{\&quot;path\&quot;: \&quot;sample/spec.md\&quot;, \&quot;sha256\&quot;: \&quot;ce4b16070cb06457d584c1c5b8f5b52f533c52595ad45f68f3866bd9d87239cf\&quot;, \&quot;content\&quot;: \&quot;# TASK-PRIORITY: task priority filter, revision 1\\n\\nAdd an optional `priority=None` parameter to `tasks.py:list_tasks`.\\nAccepted values are `high`, `medium`, `low` and None. Reject other values with\\nValueError, including when the input list is empty. Filter status AND priority\\nwhen both are given. Preserve input order, status positional-call compatibility,\\nempty-input behavior and copy-on-return semantics. Never mutate input tasks.\\n\\nRequired sources: this specification; tasks.py:list_tasks; test_tasks.py:TargetTests;\\ntest_tasks.py:RegressionTests. These tests must remain identical before and after.\\n\&quot;}&quot;
+    }
+  ],
+  &quot;passed&quot;: true
+}
+</pre></section></html>

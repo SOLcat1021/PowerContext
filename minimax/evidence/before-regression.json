@@ -1,0 +1,14 @@
+{
+  "command": [
+    "C:\\Users\\39253\\miniconda3\\python.exe",
+    "-m",
+    "unittest",
+    "-v",
+    "test_tasks.RegressionTests"
+  ],
+  "exit_code": 0,
+  "stdout": "",
+  "stderr": "test_all_tasks (test_tasks.RegressionTests) ... ok\ntest_empty (test_tasks.RegressionTests) ... ok\ntest_no_alias (test_tasks.RegressionTests) ... ok\ntest_status (test_tasks.RegressionTests) ... ok\n\n----------------------------------------------------------------------\nRan 4 tests in 0.000s\n\nOK\n",
+  "source_sha256": "3e9c861795faa01637cbedff558a5b1a0d2c5859ca343f30d1eefc5b3481e34d",
+  "tests_sha256": "24f0ab42ea812a2b6c098a3b9f965ccefba8bf70c86543de2589a2b90ec18c2d"
+}

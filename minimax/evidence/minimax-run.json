@@ -1,0 +1,20 @@
+{
+  "command": [
+    "C:\\Users\\39253\\AppData\\Roaming\\npm\\mcode.cmd",
+    "exec",
+    "--cwd",
+    "E:\\CodexP\\OceanBase\\PowerContext-minimax\\minimax",
+    "--input",
+    "-",
+    "--timeout",
+    "4m",
+    "--max-steps",
+    "15",
+    "--output-format",
+    "json",
+    "--prompt-mode",
+    "coding"
+  ],
+  "started_at": "2026-10-29T05:11:12.534653+00:00",
+  "exit_code": 0
+}

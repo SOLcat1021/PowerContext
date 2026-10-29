@@ -1,0 +1,38 @@
+{
+  "state": {
+    "task": "TASK-PRIORITY",
+    "completed": [
+      "MiniMax code change",
+      "10 unchanged tests pass",
+      "backend and context module restarted",
+      "state reused in subsequent context",
+      "specification re-import"
+    ],
+    "todo": [],
+    "verification": "evidence/after-all.json"
+  },
+  "receipt": {
+    "memory": {
+      "family": "memory",
+      "artifact_id": "memory",
+      "revision": 2
+    },
+    "entry": {
+      "citation": {
+        "memory_ref": {
+          "family": "memory",
+          "artifact_id": "memory",
+          "revision": 2
+        },
+        "entry_id": "mem_ent_dafb2451c6d246b08b0939b820df1a20",
+        "entry_version_id": "mem_ver_2a48ea7a79de461bbc69926055733a22"
+      },
+      "version": 1,
+      "kind": "task_progress",
+      "text": "minimaxprogress\n{\"task\": \"TASK-PRIORITY\", \"completed\": [\"MiniMax code change\", \"10 unchanged tests pass\", \"backend and context module restarted\", \"state reused in subsequent context\", \"specification re-import\"], \"todo\": [], \"verification\": \"evidence/after-all.json\"}",
+      "state": "active",
+      "source_refs": [],
+      "artifact_refs": []
+    }
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "state": {
+    "task": "TASK-PRIORITY",
+    "completed": [
+      "MiniMax code change",
+      "target and regression tests"
+    ],
+    "todo": [
+      "restart context module and verify persisted state",
+      "spec update verification"
+    ],
+    "verification": "evidence/after-all.json",
+    "model": {
+      "providerId": "minimax",
+      "modelId": "MiniMax-M3.1-Flash",
+      "variant": "thinking",
+      "providerSource": "provider",
+      "providerKind": "minimax-managed"
+    }
+  },
+  "receipt": {
+    "memory": {
+      "family": "memory",
+      "artifact_id": "memory",
+      "revision": 1
+    },
+    "entry": {
+      "citation": {
+        "memory_ref": {
+          "family": "memory",
+          "artifact_id": "memory",
+          "revision": 1
+        },
+        "entry_id": "mem_ent_494a95e7f7d949d09d996c3df73794a6",
+        "entry_version_id": "mem_ver_27b60dc717bb4627b3fcd09526278cbd"
+      },
+      "version": 1,
+      "kind": "task_progress",
+      "text": "minimaxprogress\n{\"task\": \"TASK-PRIORITY\", \"completed\": [\"MiniMax code change\", \"target and regression tests\"], \"todo\": [\"restart context module and verify persisted state\", \"spec update verification\"], \"verification\": \"evidence/after-all.json\", \"model\": {\"providerId\": \"minimax\", \"modelId\": \"MiniMax-M3.1-Flash\", \"variant\": \"thinking\", \"providerSource\": \"provider\", \"providerKind\": \"minimax-managed\"}}",
+      "state": "active",
+      "source_refs": [],
+      "artifact_refs": []
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "command": [
+    "C:\\Users\\39253\\miniconda3\\python.exe",
+    "-m",
+    "unittest",
+    "-v"
+  ],
+  "exit_code": 0,
+  "stdout": "",
+  "stderr": "test_all_tasks (test_tasks.RegressionTests) ... ok\ntest_empty (test_tasks.RegressionTests) ... ok\ntest_no_alias (test_tasks.RegressionTests) ... ok\ntest_status (test_tasks.RegressionTests) ... ok\ntest_combined (test_tasks.TargetTests) ... ok\ntest_invalid (test_tasks.TargetTests) ... ok\ntest_invalid_even_empty (test_tasks.TargetTests) ... ok\ntest_none (test_tasks.TargetTests) ... ok\ntest_preserve_input (test_tasks.TargetTests) ... ok\ntest_priority (test_tasks.TargetTests) ... ok\n\n----------------------------------------------------------------------\nRan 10 tests in 0.000s\n\nOK\n",
+  "source_sha256": "85a89e79c4f3414f8ec583b20f0bdd91ed5fecabcd8164ab4ebe91bbcf4df45c",
+  "tests_sha256": "24f0ab42ea812a2b6c098a3b9f965ccefba8bf70c86543de2589a2b90ec18c2d"
+}
