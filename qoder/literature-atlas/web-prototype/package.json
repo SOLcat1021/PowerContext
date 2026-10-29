@@ -1,0 +1,31 @@
+{
+  "name": "glimmer-axis",
+  "private": true,
+  "version": "0.2.9",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0 --port 4173 --strictPort",
+    "build": "vite build",
+    "build:site": "node scripts/build-site.mjs",
+    "preview": "vite preview --host 0.0.0.0 --port 4173 --strictPort",
+    "start:ai": "node server/local-ai.mjs",
+    "start:local": "node server/local-ai.mjs",
+    "verify:context": "node scripts/verify-powercontext.mjs",
+    "android:sync": "cap sync android",
+    "android:open": "cap open android",
+    "android:apk": "powershell -NoProfile -ExecutionPolicy Bypass -File ./build-apk.ps1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.5.3",
+    "vite": "^6.3.5"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.5.3",
+    "@capacitor/app": "8.1.2",
+    "@capacitor/core": "8.5.3",
+    "@capacitor/filesystem": "8.1.4",
+    "@capacitor/share": "8.0.3",
+    "pdfjs-dist": "^6.4.299",
+    "three": "^0.186.1"
+  }
+}
