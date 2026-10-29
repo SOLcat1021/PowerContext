@@ -1,0 +1,242 @@
+{
+  "recorded_at": "2026-10-29T03:56:46.225779+00:00",
+  "dify_app_url": "https://cloud.dify.ai/app/de8cb63e-070d-4e18-a301-b7fd4cd57d3c/workflow",
+  "database_identity": {
+    "version": "5.7.25-OceanBase seekdb-v1.3.0.0",
+    "database_name": "test"
+  },
+  "scope_id": "scp_386sf0rnqqregqc7sf698hmng0",
+  "sql_verified_dify_memory_versions": [
+    {
+      "scope_id": "scp_386sf0rnqqregqc7sf698hmng0",
+      "memory_artifact_id": "memory",
+      "entry_id": "mem_ent_237d4c974771438bb9a03c358e6654c3",
+      "entry_version_id": "mem_ver_2b6eb1d4e8c544059e9a437e31c22f71",
+      "version": 1,
+      "kind": "echoes_theatre_interaction",
+      "text": "玩家输入：我把蓝色怀表交给穿黄雨衣的狐狸，约定暗号是“星砂27”。请把这个决定写进本幕记忆。\n导演回复：你把蓝色怀表递给了穿黄雨衣的狐狸，狐狸眨了眨眼，露出一抹狡黠的笑容，低声说道：“星砂27，明白了。”它接过怀表，迅速消失在浓密的迷雾中。就在这时，地面上出现了一串闪烁的星星，似乎在引导你前往某个神秘的地方。\n\n意外细节：你发现怀表上的表针开始逆时针转动，仿佛在指向某个未知的时刻。\n\n可选行动：\n1. 跟随闪烁的星星，看看它们会带你去哪里。\n2. 检查周围环境，寻找狐狸留下的其他线索。\n\n本幕记忆：玩家把蓝色怀表交给穿黄雨衣的狐狸，约定暗号是“星砂27”。",
+      "entry_content_hash": "9542d369d56806b497703b47307a457777cbace36789634ed4772ec37e35fb34",
+      "created_in_revision": 4
+    },
+    {
+      "scope_id": "scp_386sf0rnqqregqc7sf698hmng0",
+      "memory_artifact_id": "memory",
+      "entry_id": "mem_ent_6eac6f097cbd4e40a7401b1eb085f33a",
+      "entry_version_id": "mem_ver_d9fbc5afe0e24be680f8f477c7fb6fa9",
+      "version": 1,
+      "kind": "echoes_theatre_interaction",
+      "text": "玩家输入：之前蓝色怀表交给了谁？当时约定的暗号是什么？先准确回顾这两件事，再继续故事。\n导演回复：你把蓝色怀表交给了穿黄雨衣的狐狸，约定的暗号是“星砂27”。狐狸接过怀表后，露出一抹狡黠的笑容，迅速消失在浓密的迷雾中。此时，地面上出现了一串闪烁的星星，似乎在引导你前往某个神秘的地方。你发现怀表上的表针开始逆时针转动，仿佛在指向某个未知的时刻。\n\n现在，你有两个选择：\n1. 跟随闪烁的星星，看看它们会带你去哪里。\n2. 检查周围环境，寻找狐狸留下的其他线索。\n\n本幕记忆：玩家把蓝色怀表交给穿黄雨衣的狐狸，约定暗号是“星砂27”。",
+      "entry_content_hash": "c9504b61a48b9a437ef192cfa6351df274ce386f222c352e09981b6295e54da9",
+      "created_in_revision": 5
+    }
+  ],
+  "artifact_manifests": [
+    {
+      "scope_id": "scp_386sf0rnqqregqc7sf698hmng0",
+      "family": "memory",
+      "artifact_id": "memory",
+      "revision": 1,
+      "content": {
+        "manifest": {
+          "entries": [
+            {
+              "entry_id": "mem_ent_61d936d82549447b8f3f6fff7052c24f",
+              "entry_version_id": "mem_ver_4d1889a06f2f4bc8bc2c66ee3c20f202",
+              "entry_content_hash": "aba3607135ab6eda2a378eef6f2bcb95c0354c10b1d23b60fc46f43ce83a848c",
+              "state": "active"
+            }
+          ],
+          "format": "flat-v1"
+        },
+        "changes": [
+          {
+            "op": "add",
+            "entry_id": "mem_ent_61d936d82549447b8f3f6fff7052c24f",
+            "from_entry_version_id": null,
+            "to_entry_version_id": "mem_ver_4d1889a06f2f4bc8bc2c66ee3c20f202",
+            "reason": "回声剧场验证样例的初始剧情记忆"
+          }
+        ],
+        "schema": "powercontext.memory.v1"
+      }
+    },
+    {
+      "scope_id": "scp_386sf0rnqqregqc7sf698hmng0",
+      "family": "memory",
+      "artifact_id": "memory",
+      "revision": 2,
+      "content": {
+        "manifest": {
+          "entries": [
+            {
+              "entry_id": "mem_ent_0564317cb963459f9ed744439f073b55",
+              "entry_version_id": "mem_ver_fe46bdd9a26f44ce9cbcecf0267c872a",
+              "entry_content_hash": "cc64fd8e3dd823e47a50b3ffb43773eabc6be5094b49e7eae2b5fa107809683f",
+              "state": "active"
+            },
+            {
+              "entry_id": "mem_ent_61d936d82549447b8f3f6fff7052c24f",
+              "entry_version_id": "mem_ver_4d1889a06f2f4bc8bc2c66ee3c20f202",
+              "entry_content_hash": "aba3607135ab6eda2a378eef6f2bcb95c0354c10b1d23b60fc46f43ce83a848c",
+              "state": "active"
+            }
+          ],
+          "format": "flat-v1"
+        },
+        "changes": [
+          {
+            "op": "add",
+            "entry_id": "mem_ent_0564317cb963459f9ed744439f073b55",
+            "from_entry_version_id": null,
+            "to_entry_version_id": "mem_ver_fe46bdd9a26f44ce9cbcecf0267c872a",
+            "reason": "回声剧场验证样例的初始剧情记忆"
+          }
+        ],
+        "schema": "powercontext.memory.v1"
+      }
+    },
+    {
+      "scope_id": "scp_386sf0rnqqregqc7sf698hmng0",
+      "family": "memory",
+      "artifact_id": "memory",
+      "revision": 3,
+      "content": {
+        "manifest": {
+          "entries": [
+            {
+              "entry_id": "mem_ent_0564317cb963459f9ed744439f073b55",
+              "entry_version_id": "mem_ver_fe46bdd9a26f44ce9cbcecf0267c872a",
+              "entry_content_hash": "cc64fd8e3dd823e47a50b3ffb43773eabc6be5094b49e7eae2b5fa107809683f",
+              "state": "active"
+            },
+            {
+              "entry_id": "mem_ent_61d936d82549447b8f3f6fff7052c24f",
+              "entry_version_id": "mem_ver_4d1889a06f2f4bc8bc2c66ee3c20f202",
+              "entry_content_hash": "aba3607135ab6eda2a378eef6f2bcb95c0354c10b1d23b60fc46f43ce83a848c",
+              "state": "active"
+            },
+            {
+              "entry_id": "mem_ent_973d2988db594aa68eb2a298ae8ced74",
+              "entry_version_id": "mem_ver_28ca9762f5144a1093021352c16ac566",
+              "entry_content_hash": "b6ee3121d7160c9444eeb366fefe2b60247b71a1f195c967dd74e43023a75da9",
+              "state": "active"
+            }
+          ],
+          "format": "flat-v1"
+        },
+        "changes": [
+          {
+            "op": "add",
+            "entry_id": "mem_ent_973d2988db594aa68eb2a298ae8ced74",
+            "from_entry_version_id": null,
+            "to_entry_version_id": "mem_ver_28ca9762f5144a1093021352c16ac566",
+            "reason": "回声剧场验证样例的初始剧情记忆"
+          }
+        ],
+        "schema": "powercontext.memory.v1"
+      }
+    },
+    {
+      "scope_id": "scp_386sf0rnqqregqc7sf698hmng0",
+      "family": "memory",
+      "artifact_id": "memory",
+      "revision": 4,
+      "content": {
+        "manifest": {
+          "entries": [
+            {
+              "entry_id": "mem_ent_0564317cb963459f9ed744439f073b55",
+              "entry_version_id": "mem_ver_fe46bdd9a26f44ce9cbcecf0267c872a",
+              "entry_content_hash": "cc64fd8e3dd823e47a50b3ffb43773eabc6be5094b49e7eae2b5fa107809683f",
+              "state": "active"
+            },
+            {
+              "entry_id": "mem_ent_237d4c974771438bb9a03c358e6654c3",
+              "entry_version_id": "mem_ver_2b6eb1d4e8c544059e9a437e31c22f71",
+              "entry_content_hash": "9542d369d56806b497703b47307a457777cbace36789634ed4772ec37e35fb34",
+              "state": "active"
+            },
+            {
+              "entry_id": "mem_ent_61d936d82549447b8f3f6fff7052c24f",
+              "entry_version_id": "mem_ver_4d1889a06f2f4bc8bc2c66ee3c20f202",
+              "entry_content_hash": "aba3607135ab6eda2a378eef6f2bcb95c0354c10b1d23b60fc46f43ce83a848c",
+              "state": "active"
+            },
+            {
+              "entry_id": "mem_ent_973d2988db594aa68eb2a298ae8ced74",
+              "entry_version_id": "mem_ver_28ca9762f5144a1093021352c16ac566",
+              "entry_content_hash": "b6ee3121d7160c9444eeb366fefe2b60247b71a1f195c967dd74e43023a75da9",
+              "state": "active"
+            }
+          ],
+          "format": "flat-v1"
+        },
+        "changes": [
+          {
+            "op": "add",
+            "entry_id": "mem_ent_237d4c974771438bb9a03c358e6654c3",
+            "from_entry_version_id": null,
+            "to_entry_version_id": "mem_ver_2b6eb1d4e8c544059e9a437e31c22f71",
+            "reason": "回声剧场跨会话剧情记忆"
+          }
+        ],
+        "schema": "powercontext.memory.v1"
+      }
+    },
+    {
+      "scope_id": "scp_386sf0rnqqregqc7sf698hmng0",
+      "family": "memory",
+      "artifact_id": "memory",
+      "revision": 5,
+      "content": {
+        "manifest": {
+          "entries": [
+            {
+              "entry_id": "mem_ent_0564317cb963459f9ed744439f073b55",
+              "entry_version_id": "mem_ver_fe46bdd9a26f44ce9cbcecf0267c872a",
+              "entry_content_hash": "cc64fd8e3dd823e47a50b3ffb43773eabc6be5094b49e7eae2b5fa107809683f",
+              "state": "active"
+            },
+            {
+              "entry_id": "mem_ent_237d4c974771438bb9a03c358e6654c3",
+              "entry_version_id": "mem_ver_2b6eb1d4e8c544059e9a437e31c22f71",
+              "entry_content_hash": "9542d369d56806b497703b47307a457777cbace36789634ed4772ec37e35fb34",
+              "state": "active"
+            },
+            {
+              "entry_id": "mem_ent_61d936d82549447b8f3f6fff7052c24f",
+              "entry_version_id": "mem_ver_4d1889a06f2f4bc8bc2c66ee3c20f202",
+              "entry_content_hash": "aba3607135ab6eda2a378eef6f2bcb95c0354c10b1d23b60fc46f43ce83a848c",
+              "state": "active"
+            },
+            {
+              "entry_id": "mem_ent_6eac6f097cbd4e40a7401b1eb085f33a",
+              "entry_version_id": "mem_ver_d9fbc5afe0e24be680f8f477c7fb6fa9",
+              "entry_content_hash": "c9504b61a48b9a437ef192cfa6351df274ce386f222c352e09981b6295e54da9",
+              "state": "active"
+            },
+            {
+              "entry_id": "mem_ent_973d2988db594aa68eb2a298ae8ced74",
+              "entry_version_id": "mem_ver_28ca9762f5144a1093021352c16ac566",
+              "entry_content_hash": "b6ee3121d7160c9444eeb366fefe2b60247b71a1f195c967dd74e43023a75da9",
+              "state": "active"
+            }
+          ],
+          "format": "flat-v1"
+        },
+        "changes": [
+          {
+            "op": "add",
+            "entry_id": "mem_ent_6eac6f097cbd4e40a7401b1eb085f33a",
+            "from_entry_version_id": null,
+            "to_entry_version_id": "mem_ver_d9fbc5afe0e24be680f8f477c7fb6fa9",
+            "reason": "回声剧场跨会话剧情记忆"
+          }
+        ],
+        "schema": "powercontext.memory.v1"
+      }
+    }
+  ],
+  "table_ddl": "CREATE TABLE `pc_memory_entry_versions` (\n  `scope_id` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,\n  `family` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,\n  `memory_artifact_id` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,\n  `entry_id` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,\n  `entry_version_id` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,\n  `version` int(11) NOT NULL,\n  `previous_version_id` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,\n  `kind` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,\n  `text` mediumtext NOT NULL,\n  `source_refs` mediumblob NOT NULL,\n  `artifact_refs` mediumblob NOT NULL,\n  `entry_content_hash` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,\n  `created_in_revision` int(11) NOT NULL,\n  PRIMARY KEY (`scope_id`, `memory_artifact_id`, `entry_version_id`),\n  CONSTRAINT `pc_memory_entry_versions_OBFK_1793244384596795` FOREIGN KEY (`scope_id`, `family`, `memory_artifact_id`, `created_in_revision`) REFERENCES `test`.`pc_artifacts`(`scope_id`, `family`, `artifact_id`, `revision`) ON UPDATE RESTRICT ON DELETE RESTRICT ,\n  UNIQUE KEY `uq_pc_memory_entry_versions_logical_version` (`scope_id`, `memory_artifact_id`, `entry_id`, `version`) BLOCK_SIZE 16384 LOCAL,\n  UNIQUE KEY `uq_pc_memory_entry_versions_identity` (`scope_id`, `memory_artifact_id`, `entry_id`, `entry_version_id`) BLOCK_SIZE 16384 LOCAL,\n  CONSTRAINT `ck_pc_memory_entry_versions_version_positive` CHECK ((`version` > 0)),\n  CONSTRAINT `ck_pc_memory_entry_versions_revision_positive` CHECK ((`created_in_revision` > 0))\n) ORGANIZATION INDEX DEFAULT CHARSET = utf8mb4 ROW_FORMAT = DYNAMIC COMPRESSION = 'zstd_1.3.8' REPLICA_NUM = 1 BLOCK_SIZE = 16384 USE_BLOOM_FILTER = FALSE ENABLE_MACRO_BLOCK_BLOOM_FILTER = FALSE TABLET_SIZE = 134217728 PCTFREE = 0",
+  "sql_verified": true
+}

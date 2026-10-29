@@ -1,0 +1,6 @@
+{
+  "base_url": "http://127.0.0.1:18180",
+  "unauthenticated_status": 401,
+  "authenticated_status": 200,
+  "search_hits": 1
+}

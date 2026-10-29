@@ -7,8 +7,8 @@ import os
 import urllib.request
 
 
-base_url = os.environ.get("POWERCONTEXT_BASE_URL", "http://127.0.0.1:8000").rstrip("/")
-scope_id = os.environ.get("POWERCONTEXT_SCOPE_ID", "dify-echoes-demo")
+base_url = os.environ.get("POWERCONTEXT_BASE_URL", "http://127.0.0.1:18180").rstrip("/")
+scope_id = os.environ["POWERCONTEXT_SCOPE_ID"]
 token = os.environ.get("POWERCONTEXT_TOKEN", "")
 
 
@@ -28,7 +28,7 @@ def post(path: str, payload: dict) -> dict:
 
 result = post(
     "/v1/memory/search",
-    {"scope_id": scope_id, "query": "月亮车站和会说冷笑话的猫", "limit": 8, "mode": "auto"},
+    {"scope_id": scope_id, "query": "月亮车站", "limit": 8, "mode": "fts"},
 )
 hits = result.get("hits", [])
 print(f"search_hits={len(hits)}")

@@ -1,0 +1,30 @@
+- generic: 🎭
+- generic: 回声剧场 Echoes Theatre
+- button "收起侧边栏"
+- button "开启新对话": 开启新对话
+- button "蓝色怀表之前交给了谁，约定暗号是什么？请先回顾，再给我下一幕的两个选择。"
+- button "更多"
+- button "更多"
+- generic: Powered by
+- img "Dify"
+- button:
+- generic: 🎭
+- button "重置对话":
+- paragraph: 蓝色怀表之前交给了谁，约定暗号是什么？请先回顾，再给我下一幕的两个选择。
+- generic: 🤖
+- 'button "用户反馈: 赞同"'
+- 'button "用户反馈: 反对"'
+- button "工作流运行成功 回复玩家":
+  - img "工作流运行成功"
+  - generic: 回复玩家
+- paragraph: 你把蓝色怀表交给了穿黄雨衣的狐狸，约定的暗号是“星砂27”。狐狸接过怀表后，露出一抹狡黠的笑容，迅速消失在浓密的迷雾中。此时，地面上出现了一串闪烁的星星，似乎在引导你前往某个神秘的地方。怀表上的表针开始逆时针转动，仿佛在指向某个未知的时刻。
+- paragraph: 意外细节：在你脚下，一只迷你机器人突然从星星中跳了出来，开始用闪烁的灯光舞动，似乎在表演。
+- paragraph: 现在，你有两个选择：
+- list:
+  - listitem: 跟随闪烁的星星，看看它们会带你去哪里。
+  - listitem: 检查周围环境，寻找狐狸留下的其他线索。
+- paragraph: 本幕记忆：玩家把蓝色怀表交给穿黄雨衣的狐狸，约定暗号是“星砂27”。
+- textbox "和 回声剧场 Echoes Theatre 聊天"
+- button "发送" [disabled]
+- alert
+- region "Notifications"

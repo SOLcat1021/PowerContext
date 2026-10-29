@@ -1,0 +1,127 @@
+{
+  "recorded_at": "2026-10-29T03:28:58.959240+00:00",
+  "kind": "real_http_and_sql",
+  "dify_engine_executed": false,
+  "probe_text": "玩家把 \"发光钥匙\" 交给猫。\n路径 C:\\moon；记号 echoesprobe5ee377a0780742c184651adab2cdb921 🎭",
+  "rounds": [
+    {
+      "process_id": 109913,
+      "http_search": {
+        "memory": {
+          "family": "memory",
+          "artifact_id": "memory",
+          "revision": 1
+        },
+        "mode": "fts",
+        "hits": [
+          {
+            "citation": {
+              "memory_ref": {
+                "family": "memory",
+                "artifact_id": "memory",
+                "revision": 1
+              },
+              "entry_id": "mem_ent_9905f47cde5d4e01a5820ff4530f366a",
+              "entry_version_id": "mem_ver_da63af6363ed4a86b3d1e77ad71a1751"
+            },
+            "text": "玩家输入：我说：\"请记住\"\n\n导演回复：玩家把 \"发光钥匙\" 交给猫。\n路径 C:\\moon；记号 echoesprobe5ee377a0780742c184651adab2cdb921 🎭",
+            "score": 0.01639344262295082,
+            "matched_by": [
+              "fts"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "process_id": 110193,
+      "http_search": {
+        "memory": {
+          "family": "memory",
+          "artifact_id": "memory",
+          "revision": 1
+        },
+        "mode": "fts",
+        "hits": [
+          {
+            "citation": {
+              "memory_ref": {
+                "family": "memory",
+                "artifact_id": "memory",
+                "revision": 1
+              },
+              "entry_id": "mem_ent_9905f47cde5d4e01a5820ff4530f366a",
+              "entry_version_id": "mem_ver_da63af6363ed4a86b3d1e77ad71a1751"
+            },
+            "text": "玩家输入：我说：\"请记住\"\n\n导演回复：玩家把 \"发光钥匙\" 交给猫。\n路径 C:\\moon；记号 echoesprobe5ee377a0780742c184651adab2cdb921 🎭",
+            "score": 0.01639344262295082,
+            "matched_by": [
+              "fts"
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "scope_id": "scp_3xswmgc8t7skv20ykw90zmtzm1",
+  "memory": {
+    "family": "memory",
+    "artifact_id": "memory",
+    "revision": 1
+  },
+  "empty_before_write": true,
+  "create_scope_replay_same_id": true,
+  "written_text": "玩家输入：我说：\"请记住\"\n\n导演回复：玩家把 \"发光钥匙\" 交给猫。\n路径 C:\\moon；记号 echoesprobe5ee377a0780742c184651adab2cdb921 🎭",
+  "other_scope_isolated": true,
+  "database_identity": {
+    "version": "5.7.25-OceanBase seekdb-v1.3.0.0",
+    "database_name": "test"
+  },
+  "sql_artifacts": [
+    {
+      "scope_id": "scp_3xswmgc8t7skv20ykw90zmtzm1",
+      "family": "memory",
+      "artifact_id": "memory",
+      "revision": 1,
+      "content_sha256": "19f45b78cc8397e1c32b0356805e30485b296b34a5a2c7ee6c1df70c792a49ac",
+      "content": {
+        "manifest": {
+          "entries": [
+            {
+              "entry_id": "mem_ent_9905f47cde5d4e01a5820ff4530f366a",
+              "entry_version_id": "mem_ver_da63af6363ed4a86b3d1e77ad71a1751",
+              "entry_content_hash": "adc8ed0911a5f99619b3dd0084e7c043484edfe4ec6c9a9ba53fd15b02364c9b",
+              "state": "active"
+            }
+          ],
+          "format": "flat-v1"
+        },
+        "changes": [
+          {
+            "op": "add",
+            "entry_id": "mem_ent_9905f47cde5d4e01a5820ff4530f366a",
+            "from_entry_version_id": null,
+            "to_entry_version_id": "mem_ver_da63af6363ed4a86b3d1e77ad71a1751",
+            "reason": "回声剧场跨会话剧情记忆"
+          }
+        ],
+        "schema": "powercontext.memory.v1"
+      }
+    }
+  ],
+  "sql_memory_versions": [
+    {
+      "scope_id": "scp_3xswmgc8t7skv20ykw90zmtzm1",
+      "memory_artifact_id": "memory",
+      "entry_id": "mem_ent_9905f47cde5d4e01a5820ff4530f366a",
+      "entry_version_id": "mem_ver_da63af6363ed4a86b3d1e77ad71a1751",
+      "kind": "echoes_theatre_interaction",
+      "text": "玩家输入：我说：\"请记住\"\n\n导演回复：玩家把 \"发光钥匙\" 交给猫。\n路径 C:\\moon；记号 echoesprobe5ee377a0780742c184651adab2cdb921 🎭",
+      "entry_content_hash": "adc8ed0911a5f99619b3dd0084e7c043484edfe4ec6c9a9ba53fd15b02364c9b",
+      "created_in_revision": 1
+    }
+  ],
+  "artifact_table_ddl": "CREATE TABLE `pc_artifacts` (\n  `scope_id` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,\n  `family` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,\n  `artifact_id` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,\n  `revision` int(11) NOT NULL,\n  `content` mediumblob NOT NULL,\n  `memory_citations` mediumblob DEFAULT NULL,\n  PRIMARY KEY (`scope_id`, `family`, `artifact_id`, `revision`)\n) ORGANIZATION INDEX DEFAULT CHARSET = utf8mb4 ROW_FORMAT = DYNAMIC COMPRESSION = 'zstd_1.3.8' REPLICA_NUM = 1 BLOCK_SIZE = 16384 USE_BLOOM_FILTER = FALSE ENABLE_MACRO_BLOCK_BLOOM_FILTER = FALSE TABLET_SIZE = 134217728 PCTFREE = 0",
+  "memory_versions_table_ddl": "CREATE TABLE `pc_memory_entry_versions` (\n  `scope_id` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,\n  `family` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,\n  `memory_artifact_id` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,\n  `entry_id` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,\n  `entry_version_id` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,\n  `version` int(11) NOT NULL,\n  `previous_version_id` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,\n  `kind` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,\n  `text` mediumtext NOT NULL,\n  `source_refs` mediumblob NOT NULL,\n  `artifact_refs` mediumblob NOT NULL,\n  `entry_content_hash` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,\n  `created_in_revision` int(11) NOT NULL,\n  PRIMARY KEY (`scope_id`, `memory_artifact_id`, `entry_version_id`),\n  CONSTRAINT `pc_memory_entry_versions_OBFK_1793244384596795` FOREIGN KEY (`scope_id`, `family`, `memory_artifact_id`, `created_in_revision`) REFERENCES `test`.`pc_artifacts`(`scope_id`, `family`, `artifact_id`, `revision`) ON UPDATE RESTRICT ON DELETE RESTRICT ,\n  UNIQUE KEY `uq_pc_memory_entry_versions_logical_version` (`scope_id`, `memory_artifact_id`, `entry_id`, `version`) BLOCK_SIZE 16384 LOCAL,\n  UNIQUE KEY `uq_pc_memory_entry_versions_identity` (`scope_id`, `memory_artifact_id`, `entry_id`, `entry_version_id`) BLOCK_SIZE 16384 LOCAL,\n  CONSTRAINT `ck_pc_memory_entry_versions_version_positive` CHECK ((`version` > 0)),\n  CONSTRAINT `ck_pc_memory_entry_versions_revision_positive` CHECK ((`created_in_revision` > 0))\n) ORGANIZATION INDEX DEFAULT CHARSET = utf8mb4 ROW_FORMAT = DYNAMIC COMPRESSION = 'zstd_1.3.8' REPLICA_NUM = 1 BLOCK_SIZE = 16384 USE_BLOOM_FILTER = FALSE ENABLE_MACRO_BLOCK_BLOOM_FILTER = FALSE TABLET_SIZE = 134217728 PCTFREE = 0",
+  "passed": true
+}

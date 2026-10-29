@@ -1,0 +1,9 @@
+{
+  "repository": "https://github.com/SOLcat1021/PowerContext",
+  "commit": "3f9a93b6578dcf8517e424af93273bf27ddc0572",
+  "upstream_repository": "https://github.com/oceanbase/powercontext",
+  "license": "Apache-2.0",
+  "included_paths": ["src", "pyproject.toml", "README.md", "LICENSE", "uv.lock"],
+  "runtime_source_changes": [],
+  "packaging_change": "pyproject.toml uses a static local version because archives have no nested Git metadata, and pins the embedded binding to pylibseekdb 1.3.0.post4 used by the recorded acceptance. Runtime .py sources are unchanged."
+}

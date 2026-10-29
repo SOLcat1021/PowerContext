@@ -1,0 +1,2 @@
+# Preserve the exact bytes checked by backend/source-sha256.json on Windows.
+backend/powercontext/** -text whitespace=cr-at-eol

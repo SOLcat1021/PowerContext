@@ -13,8 +13,8 @@ import urllib.error
 import urllib.request
 
 
-BASE_URL = os.environ.get("POWERCONTEXT_BASE_URL", "http://127.0.0.1:8000").rstrip("/")
-SCOPE_ID = os.environ.get("POWERCONTEXT_SCOPE_ID", "dify-echoes-demo")
+BASE_URL = os.environ.get("POWERCONTEXT_BASE_URL", "http://127.0.0.1:18180").rstrip("/")
+SCOPE_KEY = os.environ.get("POWERCONTEXT_SCOPE_KEY", "dify-echoes-demo")
 TOKEN = os.environ.get("POWERCONTEXT_TOKEN", "")
 
 
@@ -46,17 +46,14 @@ def main() -> int:
         {
             "title": "回声剧场演示",
             "summary": "Dify Just for Fun 作品的跨会话剧情记忆",
-            "idempotency_key": SCOPE_ID,
+            "idempotency_key": SCOPE_KEY,
         },
     )
-    if status not in (201, 409):
+    if status != 201 or not isinstance(body, dict) or not body.get("scope_id"):
         print(f"创建 Scope 失败（HTTP {status}）：{body}", file=sys.stderr)
         return 1
 
-    if status == 201 and isinstance(body, dict):
-        actual_scope = body.get("scope_id") or body.get("id") or SCOPE_ID
-    else:
-        actual_scope = SCOPE_ID
+    actual_scope = body["scope_id"]
 
     seed = [
         "玩家喜欢把危险的道具交给会说冷笑话的猫。",
@@ -64,6 +61,14 @@ def main() -> int:
         "玩家已经答应过守门人：每次改变路线都要留下一个荒诞的理由。",
     ]
     for text in seed:
+        status, existing = request("POST", "/v1/memory/search", {
+            "scope_id": actual_scope, "query": text, "limit": 50, "mode": "fts",
+        })
+        if status != 200 or not isinstance(existing, dict):
+            print(f"检查初始记忆失败（HTTP {status}）：{existing}", file=sys.stderr)
+            return 1
+        if any(hit.get("text") == text for hit in existing.get("hits", [])):
+            continue
         status, body = request(
             "POST",
             "/v1/memory/remember",
@@ -79,7 +84,7 @@ def main() -> int:
             return 1
 
     print(f"POWERCONTEXT_SCOPE_ID={actual_scope}")
-    print("已写入 3 条初始剧情记忆。请把这个 Scope ID 填入 Dify 的环境变量 POWERCONTEXT_SCOPE_ID。")
+    print("3 条初始剧情记忆已就绪。请把这个 Scope ID 填入 Dify 的环境变量 POWERCONTEXT_SCOPE_ID。")
     return 0
 
 

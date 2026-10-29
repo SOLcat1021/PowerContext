@@ -1,0 +1,7 @@
+.env
+.echoes-runtime
+**/__pycache__
+**/*.pyc
+evidence
+tests
+.venv

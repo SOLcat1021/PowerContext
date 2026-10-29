@@ -1,0 +1,14 @@
+services:
+  powercontext:
+    build: .
+    env_file: .env
+    environment:
+      POWERCONTEXT_HOST: 0.0.0.0
+      POWERCONTEXT_WORKSPACE: /app/.echoes-runtime
+    ports:
+      - "127.0.0.1:18180:18180"
+    volumes:
+      - echoes-runtime:/app/.echoes-runtime
+    restart: unless-stopped
+volumes:
+  echoes-runtime:
